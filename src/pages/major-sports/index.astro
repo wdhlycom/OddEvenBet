@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const entries = (await getCollection('major-sports', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+---
+
+<BaseLayout
+  title="Major sports betting: the big leagues and top sportsbooks"
+  description="A concise directory of the major sportsbooks — bet365, DraftKings and the rest — for bettors who just want a trusted licensed operator."
+  path="/major-sports"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Major Sports</span>
+      <h1>The big leagues, listed without the noise</h1>
+      <p class="lede">
+        Premier League, NBA, NFL and the other major competitions are already covered by
+        every site on the internet. We keep this section lean: a directory of the licensed
+        books worth your money, no padding.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {entries.length > 0 ? (
+      <div class="grid">
+        {entries.map((e) => (
+          <article class="card card-link">
+            <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+            <h3><a href={`/major-sports/${e.id}`}>{e.data.title}</a></h3>
+            <p>{e.data.summary}</p>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p class="muted">
+        This directory is being built. We're keeping it deliberately short — a handful of
+        licensed books rather than a full comparison grind.
+      </p>
+    )}
+  </section>
+</BaseLayout>

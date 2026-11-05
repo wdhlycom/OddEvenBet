@@ -1,0 +1,142 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+---
+
+<BaseLayout
+  title={`${site.name} en español — solo eventos reales y verificables`}
+  description="OddEvenBet en español: solo cubrimos eventos reales con resultado verificable — mercados de predicción, deportes y carreras — nunca juegos de casino basados en el azar."
+  path="/es"
+  lang="es"
+>
+  <!-- ============ MASTHEAD ============ -->
+  <section class="masthead">
+    <div class="masthead-main">
+      <span class="kicker">Investigación independiente · Vol. 1, 2026</span>
+        <h1 class="display-title">Puntuamos con evidencia, no según quién nos paga.</h1>
+        <p class="standfirst">
+          Mercados de predicción y casas de apuestas, reseñados y clasificados con una
+          <strong>metodología pública</strong>. Cada comisión está citada. Cada afirmación
+          es verificable. Cada ranking enlaza a la reseña que lo sustenta.
+        </p>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <a class="cta" href="/es/learn">Empieza por lo básico</a>
+          <a class="cta cta--ghost" href="/prediction-markets">Ver reseñas (EN)</a>
+        </div>
+      </div>
+  </section>
+
+  <!-- ============ COLOUR FIELD — qué nos hace distintos ============ -->
+  <section class="colour-field colour-field--orange">
+    <div class="wrap" style="padding-block:56px;">
+      <span class="kicker" style="color:#141412;">Qué nos hace distintos</span>
+      <h2 style="margin-top:0; max-width:18ch;">Eventos reales, resultados comprobables, sin letra pequeña</h2>
+      <div class="grid" style="margin-top:32px;">
+        <article class="card">
+          <span class="meta">01</span>
+          <h3>Una puntuación de «verificabilidad» que nadie publica</h3>
+          <p>
+            Cada plataforma y mercado se puntúa según si su resultado puede comprobarse contra
+            una fuente fiable: estadísticas oficiales, registros judiciales, un regulador con nombre.
+          </p>
+        </article>
+        <article class="card">
+          <span class="meta">02</span>
+          <h3>Te enseñamos a verificar, no solo a hacer clic</h3>
+          <p>
+            La mayoría te dice qué plataforma es «la mejor». Nosotros además te enseñamos a
+            comprobar tú mismo si un mercado es real y si una licencia es auténtica.
+          </p>
+        </article>
+        <article class="card">
+          <span class="meta">03</span>
+          <h3>Una divulgación que de verdad divulga</h3>
+          <p>
+            Cada página indica si tiene enlaces de afiliado. Los rankings no se pueden comprar.
+            Incluso listamos las colaboraciones que rechazamos.
+            <a href="/es/disclosure" style="color:inherit; text-decoration:underline;">Lee la divulgación completa</a>.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RANKINGS ============ -->
+  <section class="wrap" style="padding-block:64px 24px;">
+    <span class="eyebrow">Rankings · actualizados cada mes</span>
+    <h2 style="margin-top:0;">Los mejor puntuados ahora mismo</h2>
+    <p class="muted" style="max-width:44ch;">
+      Ordenados por la puntuación ponderada de nuestra <a href="/es/methodology">metodología</a>.
+      Las comisiones y la liquidez pesan más.
+    </p>
+    <div class="grid" style="margin-top:28px;">
+      <article class="card">
+        <span class="meta">N.º 1</span>
+        <h3>Polymarket</h3>
+        <p>El referente en mercados de predicción: el mayor volumen y la mejor liquidez.</p>
+      </article>
+      <article class="card">
+        <span class="meta">N.º 2</span>
+        <h3>Kalshi</h3>
+        <p>Regulado por la CFTC de EE. UU., amplia oferta, ideal para usuarios estadounidenses.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ COLOUR FIELD — reseñas (sage) ============ -->
+  <section class="colour-field colour-field--sage">
+    <div class="wrap" style="padding-block:64px;">
+      <span class="kicker" style="color:#141412;">Últimas reseñas</span>
+      <h2 style="margin-top:0;">Recién salidas de la redacción</h2>
+      <div class="grid" style="margin-top:28px;">
+        <article class="card">
+          <span class="meta">Reseña · 2026</span>
+          <h3><a href="/prediction-markets/polymarket-review-2026">Reseña completa de Polymarket</a></h3>
+          <p>Comisiones, liquidación, licencia y lo que no pudimos verificar.</p>
+        </article>
+        <article class="card">
+          <span class="meta">Reseña · 2026</span>
+          <h3><a href="/reviews">Cómo elegir una casa de apuestas</a></h3>
+          <p>Primero la licencia, luego la velocidad de pago y al final las cuotas.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEER ANTES ============ -->
+  <section class="wrap" style="padding-block:64px 24px;">
+    <span class="eyebrow">Lee antes de depositar</span>
+    <h2 style="margin-top:0;">Lee esto antes de depositar nada</h2>
+    <p class="muted" style="max-width:44ch;">
+      La mayoría de las pérdidas vienen de no entender cómo funcionan la liquidación,
+      las comisiones y la liquidez.
+    </p>
+    <div class="grid" style="margin-top:28px;">
+      <article class="card">
+        <span class="meta">Básico</span>
+        <h3><a href="/es/learn/es-que-es-un-mercado-de-prediccion">¿Qué es un mercado de predicción?</a></h3>
+        <p>Un contrato entre 0 y 1 dólar cuyo precio es la probabilidad que el mercado asigna al evento.</p>
+      </article>
+      <article class="card">
+        <span class="meta">Economía</span>
+        <h3><a href="/es/learn">¿Por qué la mayoría pierde dinero?</a></h3>
+        <p>No por predecir mal, sino porque las comisiones y el spread se comen la ventaja.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ COLOUR FIELD — posición (black) ============ -->
+  <section class="colour-field colour-field--black">
+    <div class="wrap" style="padding-block:64px;">
+      <span class="kicker" style="color:var(--acid);">Nuestra posición</span>
+      <h2 style="margin-top:0; max-width:20ch;">
+        No somos un pronosticador. Somos una comprobación que puedes repetir.
+      </h2>
+      <p style="max-width:48ch; color:#b3aea4; font-size:1.05rem;">
+        Si una afirmación no se puede verificar, lo decimos — y nombramos lo que no pudimos
+        confirmar. Ese es el sentido de esta publicación.
+      </p>
+      <a class="cta" href="/es/methodology" style="background:var(--acid); color:#141412;">Lee nuestra metodología</a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,70 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site, scoreDimensions } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Metodología: cómo puntuamos las plataformas"
+  description="Nuestra rúbrica completa de puntuación, de dónde vienen los datos, qué verificamos nosotros mismos y qué no podemos. Publicada para que cualquier lector pueda recalcular cada puntuación del sitio."
+  path="/es/methodology"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Confianza</span>
+      <h1>Metodología</h1>
+      <p class="lede">
+        Publicado en {new Date().getFullYear()}. Esta página es el contrato detrás de cada puntuación en
+        {' '}{site.name}. Si una valoración no se puede rastrear hasta algo de esta página, trátala como un error.
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="methodology" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>Qué puntuamos, y cuánto cuenta</h2>
+    <p>
+      Seis dimensiones, ponderadas. Los pesos son fijos y publicados, de modo que cambiar una puntuación
+      exige cambiar una evidencia concreta, no solo una opinión.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Dimensión</th><th scope="col">Peso</th><th scope="col">Qué la mueve</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Comisiones y estructura de pago</td><td>20%</td><td>Tabla de comisiones publicada, comportamiento del spread al 10% / 50% / 90%, costes de retiro</td></tr>
+          <tr><td>Profundidad de mercado y liquidez</td><td>20%</td><td>Profundidad del libro a 2 centavos del medio, deslizamiento en una orden de $500</td></tr>
+          <tr><td>Usabilidad</td><td>20%</td><td>Pasos para abrir cuenta, descubrimiento de mercados, comportamiento móvil, claridad de las reglas de liquidación</td></tr>
+          <tr><td>Licencia y seguridad de fondos</td><td>20%</td><td>Regulador nombrable, segregación de fondos de clientes, trazabilidad de la entidad corporativa</td></tr>
+          <tr><td>Velocidad y métodos de pago</td><td>10%</td><td>Plazos documentados, vías disponibles, volumen de quejas</td></tr>
+          <tr><td>Soporte y resolución de disputas</td><td>10%</td><td>Tiempo de primera respuesta, si las disputas van a un árbitro nombrable</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>De dónde vienen los datos</h2>
+    <ul>
+      <li><strong>Primarios:</strong> la propia tabla de comisiones, términos y presentaciones regulatorias de la plataforma.</li>
+      <li><strong>Secundarios:</strong> lecturas del libro de órdenes tomadas en la fecha indicada en cada página.</li>
+      <li><strong>Terciarios:</strong> patrones de quejas de usuarios en plataformas públicas de reseñas. Las tratamos como una señal para investigar, nunca como evidencia por sí solas.</li>
+    </ul>
+
+    <h2>Lo que no hacemos</h2>
+    <ul>
+      <li>No aceptamos pagos, crédito gratis ni "tarifas de reseña" por una valoración o una posición en una lista.</li>
+      <li>No publicamos una reseña sin al menos un inconveniente declarado.</li>
+      <li>No afirmamos haber operado en una plataforma de la que solo leímos. Donde una página es solo investigación, lo dice.</li>
+    </ul>
+
+    <h2>Correcciones</h2>
+    <p>
+      Si una comisión, licencia o plazo de pago cambia, la página se actualiza y la fecha de "Actualizado"
+      se mueve. Las correcciones sustantivas se anotan en el cuerpo de la página en lugar de editarse en
+      silencio. Para señalar un error, usa el enlace de contacto en el pie de página.
+    </p>
+  </section>
+</BaseLayout>

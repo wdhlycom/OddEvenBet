@@ -1,0 +1,180 @@
+---
+// Standalone search results page body. Reads ?q= from the URL, filters results
+// to the current language, and renders the full list. Wrapped by /search, /zh/search, /es/search.
+interface Props {
+  lang?: 'en' | 'zh' | 'es'
+}
+
+const { lang = 'en' } = Astro.props
+
+const ui = {
+  en: {
+    eyebrow: 'Search',
+    h1: 'Search',
+    placeholder: 'Search terms, guides, reviews…',
+    searching: 'Searching…',
+    empty: 'No results for this query. Try a different word.',
+    hint: 'Search covers this site in your language. Type a term, platform, or question.',
+    results: 'results',
+  },
+  zh: {
+    eyebrow: '搜索',
+    h1: '搜索',
+    placeholder: '搜索术语、文章、评测…',
+    searching: '搜索中…',
+    empty: '没有找到匹配的内容，换个词试试。',
+    hint: '搜索本站当前语言的内容。输入术语、平台名或问题。',
+    results: '条结果',
+  },
+  es: {
+    eyebrow: 'Buscar',
+    h1: 'Buscar',
+    placeholder: 'Buscar…',
+    searching: 'Buscando…',
+    empty: 'Sin resultados. Prueba otra palabra.',
+    hint: 'Busca en este sitio en tu idioma.',
+    results: 'resultados',
+  },
+}[lang]
+
+const t = ui
+---
+
+<section class="page-masthead">
+  <div class="wrap">
+    <span class="eyebrow">{t.eyebrow}</span>
+    <h1>{t.h1}</h1>
+    <p class="lede">{t.hint}</p>
+  </div>
+</section>
+
+<section class="wrap measure" style="padding-block:32px 64px;">
+  <div
+    class="search-page"
+    data-lang={lang}
+    data-searching={t.searching}
+    data-empty={t.empty}
+    data-results={t.results}
+  >
+    <input
+      type="search"
+      id="page-search-input"
+      class="page-search-input"
+      placeholder={t.placeholder}
+      autocomplete="off"
+      autofocus
+    />
+    <div id="page-search-status" class="muted small" style="margin-top:12px;"></div>
+    <div id="page-search-results" style="margin-top:16px;"></div>
+  </div>
+</section>
+
+<script>
+  import { search, stripHtml } from '@/scripts/search'
+
+  const wrap = document.querySelector('.search-page') as HTMLElement | null;
+  const input = document.getElementById('page-search-input') as HTMLInputElement | null;
+  const status = document.getElementById('page-search-status') as HTMLElement | null;
+  const resultsEl = document.getElementById('page-search-results') as HTMLElement | null;
+  if (!wrap || !input || !status || !resultsEl) throw new Error('search page markup missing');
+
+  const lang = (wrap.dataset.lang as 'en' | 'zh' | 'es') || 'en';
+  const LABELS = {
+    searching: wrap.dataset.searching || '',
+    empty: wrap.dataset.empty || '',
+    results: wrap.dataset.results || '',
+  };
+
+  function escapeHtml(s: string) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function render(hits: { url: string; title: string; excerpt: string }[]) {
+    resultsEl!.innerHTML = '';
+    if (hits.length === 0) {
+      resultsEl!.innerHTML = `<div class="sr-page-empty">${LABELS.empty}</div>`;
+      return;
+    }
+    status!.textContent = `${hits.length} ${LABELS.results}`;
+    const list = document.createElement('div');
+    list.className = 'sr-page-list';
+    for (const h of hits) {
+      const a = document.createElement('a');
+      a.className = 'sr-page-item';
+      a.href = h.url;
+      const title = document.createElement('div');
+      title.className = 'sr-page-title';
+      title.textContent = h.title;
+      a.appendChild(title);
+      if (h.excerpt) {
+        const ex = document.createElement('div');
+        ex.className = 'sr-page-excerpt';
+        ex.textContent = stripHtml(h.excerpt);
+        a.appendChild(ex);
+      }
+      const url = document.createElement('div');
+      url.className = 'sr-page-url';
+      url.textContent = h.url;
+      a.appendChild(url);
+      list.appendChild(a);
+    }
+    resultsEl!.appendChild(list);
+  }
+
+  async function run() {
+    const q = input!.value.trim();
+    if (!q) {
+      resultsEl!.innerHTML = '';
+      status!.textContent = '';
+      return;
+    }
+    // Reflect the query in the URL so the page is shareable.
+    const url = new URL(window.location.href);
+    url.searchParams.set('q', q);
+    history.replaceState(null, '', url.toString());
+
+    status!.textContent = LABELS.searching;
+    const hits = await search(q, lang, 30);
+    render(hits);
+  }
+
+  let debounce: ReturnType<typeof setTimeout> | undefined;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(run, 200);
+  });
+
+  // Seed from ?q= on load.
+  const initial = new URL(window.location.href).searchParams.get('q');
+  if (initial) {
+    input.value = initial;
+    run();
+  }
+</script>
+
+<style>
+  .search-page { max-width: 680px; }
+  .page-search-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    border: 2px solid var(--border, #333);
+    border-radius: 10px;
+    background: var(--bg, #fff);
+    color: var(--text, #222);
+  }
+  .page-search-input:focus { outline: none; border-color: var(--accent, #e0a82e); }
+  .sr-page-list { display: grid; gap: 4px; }
+  .sr-page-item {
+    display: block; padding: 16px; border-radius: 10px;
+    text-decoration: none; color: inherit;
+    border: 1px solid transparent;
+  }
+  .sr-page-item:hover { border-color: var(--border, #333); background: var(--hover, rgba(0,0,0,0.03)); }
+  .sr-page-title { font-weight: 700; font-size: 1.05rem; }
+  .sr-page-excerpt { font-size: 0.9rem; color: var(--muted, #999); margin-top: 4px; }
+  .sr-page-url { font-size: 0.78rem; color: var(--accent, #e0a82e); margin-top: 6px; }
+  .sr-page-empty { padding: 32px; text-align: center; color: var(--muted, #999); }
+</style>

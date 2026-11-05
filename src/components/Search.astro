@@ -1,0 +1,171 @@
+---
+// Header search box. Live dropdown of results filtered to the current language.
+// Language + labels are passed via data-* attributes (read by the client script)
+// because Astro's `{prop}` injection into bundled module scripts is unreliable here.
+interface Props {
+  lang?: 'en' | 'zh' | 'es'
+}
+
+const { lang = 'en' } = Astro.props
+
+const placeholder =
+  lang === 'zh' ? '搜索术语、文章、评测…' : lang === 'es' ? 'Buscar…' : 'Search terms, guides, reviews…'
+const more = lang === 'zh' ? '查看全部结果 →' : lang === 'es' ? 'Ver todos →' : 'See all results →'
+const empty = lang === 'zh' ? '没有找到匹配的内容' : lang === 'es' ? 'Sin resultados' : 'No results'
+const loading = lang === 'zh' ? '搜索中…' : lang === 'es' ? 'Buscando…' : 'Searching…'
+---
+
+<div
+  class="search-box"
+  id="search-box"
+  data-lang={lang}
+  data-more={more}
+  data-empty={empty}
+  data-loading={loading}
+>
+  <span class="search-icon" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  </span>
+  <input
+    type="search"
+    class="search-input"
+    id="search-input"
+    placeholder={placeholder}
+    autocomplete="off"
+    aria-label={placeholder}
+  />
+  <div class="search-results" id="search-results" hidden></div>
+</div>
+
+<script>
+  import { search, stripHtml } from '@/scripts/search'
+
+  const box = document.getElementById('search-box') as HTMLElement | null;
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const results = document.getElementById('search-results') as HTMLElement | null;
+  if (!box || !input || !results) throw new Error('search markup missing');
+
+  const lang = (box.dataset.lang as 'en' | 'zh' | 'es') || 'en';
+  const MORE = box.dataset.more || '';
+  const EMPTY = box.dataset.empty || '';
+  const LOADING = box.dataset.loading || '';
+  const SEARCH_BASE = lang === 'zh' ? '/zh/search' : lang === 'es' ? '/es/search' : '/search';
+
+  let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  let activeQuery = '';
+
+  function escapeHtml(s: string) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function render(hits: { url: string; title: string; excerpt: string }[]) {
+    results!.innerHTML = '';
+    if (hits.length === 0) {
+      results!.innerHTML = `<div class="sr-empty">${EMPTY}</div>`;
+      results!.hidden = false;
+      return;
+    }
+    for (const h of hits) {
+      const a = document.createElement('a');
+      a.className = 'sr-item';
+      a.href = h.url;
+      a.innerHTML = `<div class="sr-title">${escapeHtml(h.title)}</div>${
+        h.excerpt ? `<div class="sr-excerpt">${stripHtml(h.excerpt)}</div>` : ''
+      }`;
+      results!.appendChild(a);
+    }
+    const more = document.createElement('a');
+    more.className = 'sr-more';
+    more.href = `${SEARCH_BASE}?q=${encodeURIComponent(activeQuery)}`;
+    more.textContent = MORE;
+    results!.appendChild(more);
+    results!.hidden = false;
+  }
+
+  async function runSearch(query: string) {
+    activeQuery = query;
+    if (!query.trim()) {
+      results!.hidden = true;
+      return;
+    }
+    results!.innerHTML = `<div class="sr-empty">${LOADING}</div>`;
+    results!.hidden = false;
+    const hits = await search(query, lang, 5);
+    render(hits);
+  }
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const q = input.value;
+    debounceTimer = setTimeout(() => runSearch(q), 180);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (box && !box.contains(e.target as Node)) results!.hidden = true;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      results!.hidden = true;
+      input.blur();
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (q) window.location.href = `${SEARCH_BASE}?q=${encodeURIComponent(q)}`;
+    }
+  });
+</script>
+
+<style>
+  .search-box { position: relative; display: flex; align-items: center; flex: 0 1 260px; min-width: 160px; }
+  .search-icon {
+    position: absolute; left: 12px; color: var(--muted, #999);
+    display: flex; pointer-events: none; z-index: 1;
+  }
+  .search-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border, #333);
+    border-radius: 999px;
+    padding: 6px 14px 6px 34px;
+    font-size: 0.9rem;
+    color: var(--text, #222);
+  }
+  .search-input:focus { outline: none; border-color: var(--accent, #e0a82e); }
+  .search-input::placeholder { color: var(--muted, #999); }
+
+  .search-results {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: var(--bg, #fff);
+    border: 1px solid var(--border, #333);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 6px;
+    max-height: 60vh; overflow-y: auto;
+    z-index: 100;
+    min-width: 320px;
+  }
+  .sr-item {
+    display: block; padding: 8px 10px; border-radius: 6px;
+    text-decoration: none; color: inherit;
+  }
+  .sr-item:hover { background: var(--hover, rgba(0,0,0,0.04)); }
+  .sr-title { font-weight: 600; font-size: 0.9rem; }
+  .sr-excerpt { font-size: 0.8rem; color: var(--muted, #999); margin-top: 2px; }
+  .sr-more {
+    display: block; padding: 8px 10px; text-align: center;
+    font-size: 0.82rem; color: var(--accent, #e0a82e); text-decoration: none;
+    border-top: 1px solid var(--border, #333); margin-top: 4px;
+  }
+  .sr-more:hover { background: var(--hover, rgba(0,0,0,0.04)); }
+  .sr-empty { padding: 12px; text-align: center; color: var(--muted, #999); font-size: 0.85rem; }
+  .search-results[hidden] { display: none; }
+</style>

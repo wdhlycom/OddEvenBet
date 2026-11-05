@@ -1,0 +1,65 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import { platforms } from '@/data/platforms'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Affiliate disclosure"
+  description="How this site makes money, which programmes we participate in, and the rules we hold ourselves to when a commercial link sits next to a recommendation."
+  path="/disclosure"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Trust</span>
+      <h1>Affiliate disclosure</h1>
+    </div>
+  </section>
+
+  <TrustNav current="disclosure" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout">
+      <strong>The short version</strong>
+      Some links on {site.name} are affiliate links. If you open an account through one, the
+      operator may pay us a commission. It does not change the price you pay, and it does not
+      change a score — our rubric is published and applied before any commercial relationship exists.
+    </div>
+
+    <h2>Programmes we participate in</h2>
+    <p>
+      We apply to affiliate programmes after a platform has been reviewed, not before. A platform
+      that declines to work with us keeps its score; a platform that pays more does not gain one.
+    </p>
+    <ul>
+      {platforms.map((p) => (
+        <li>
+          <strong>{p.name}</strong> — {p.affiliateUrl ? 'approved, tracked links in use' : 'application pending; no tracked link is live on this site yet'}
+        </li>
+      ))}
+    </ul>
+
+    <h2>How links are marked</h2>
+    <p>
+      Every outbound commercial link carries <code>rel="sponsored nofollow"</code>. Links inside
+      editorial body text that are not commercial are left as ordinary links. If you find a
+      commercial link that is not marked, that is a bug — please report it.
+    </p>
+
+    <h2>What we will not do</h2>
+    <ul>
+      <li>Publish a "guaranteed profit" or "risk-free" claim about any betting product.</li>
+      <li>Hide the fact that most retail bettors lose money over time.</li>
+      <li>Rank a platform higher because it pays a higher commission.</li>
+      <li>Run a review of a platform we have no way to verify.</li>
+    </ul>
+
+    <h2>Risk warning</h2>
+    <p>
+      Prediction markets and sports betting are not investments. Staking money on an outcome can
+      lose the entire stake. Nothing on this site is financial, legal or tax advice, and nothing
+      here is a recommendation to bet. See <a href="/responsible-gambling">responsible gambling</a>.
+    </p>
+  </section>
+</BaseLayout>

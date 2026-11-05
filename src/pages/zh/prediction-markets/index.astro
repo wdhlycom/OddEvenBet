@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const entries = (await getCollection('prediction-markets', ({ data }) => !data.draft && data.lang === 'zh'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+// 逻辑分组：先讲解（概念），再指南，再评测/对比/榜单
+const kindOrder = { explainer: 1, guide: 2, review: 3, compare: 4, best: 5 } as const
+const byKind = (k: string) => entries
+  .filter((e) => e.data.kind === k)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[] = [
+  { key: 'explainer', title: '先搞懂：基础概念', items: byKind('explainer') },
+  { key: 'guide', title: '实操指南', items: byKind('guide') },
+  { key: 'review', title: '平台评测', items: byKind('review') },
+  { key: 'compare', title: '平台对比', items: byKind('compare') },
+  { key: 'best', title: '榜单', items: byKind('best') },
+].filter((g) => g.items.length)
+---
+
+<BaseLayout
+  title="预测市场：评测、对比与指南（中文）"
+  description="对 Polymarket、Kalshi 等预测市场的实测评测、对比和指南——真实事件，结果可查。"
+  path="/zh/prediction-markets"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">预测市场</span>
+      <h1>押注真实事件，而不是庄家</h1>
+      <p class="lede">
+        预测市场让你就选举、宏观数据、世界大事和别人交易——价格就是可能性。我们评测平台、讲清机制、指出真正有风险的地方。
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {groups.map((g) => (
+      <div style="margin-top:40px;">
+        <h2>{g.title}</h2>
+        <div class="grid">
+          {g.items.map((e) => (
+            <article class="card card-link">
+              <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+              <h3><a href={`/zh/prediction-markets/${e.id}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    {entries.length === 0 && (
+      <p class="muted">中文内容正在逐步撰写中，敬请期待。</p>
+    )}
+  </section>
+</BaseLayout>

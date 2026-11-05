@@ -1,0 +1,21 @@
+---
+import { site } from '@/data/site'
+
+interface Props { name: string; role?: string }
+
+const { name, role = 'Researcher & Editor' } = Astro.props
+const initials = name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+---
+
+<div class="author-box">
+  <div class="avatar" aria-hidden="true">{initials}</div>
+  <div>
+    <strong style="color: var(--ink); display:block;">{name}</strong>
+    <span style="font-size:.82rem;">{role}, {site.name}</span>
+    <p style="margin:8px 0 0;">
+      Writes about prediction markets and licensed sportsbooks. Every review
+      states what was checked, when, and what we could not verify.
+      <a href="/methodology">Read the methodology</a>.
+    </p>
+  </div>
+</div>

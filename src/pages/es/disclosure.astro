@@ -1,0 +1,66 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import { platforms } from '@/data/platforms'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Divulgación de afiliados"
+  description="Cómo gana dinero este sitio, en qué programas participamos y las reglas que nos imponemos cuando un enlace comercial aparece junto a una recomendación."
+  path="/es/disclosure"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Confianza</span>
+      <h1>Divulgación de afiliados</h1>
+    </div>
+  </section>
+
+  <TrustNav current="disclosure" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout">
+      <strong>La versión corta</strong>
+      Algunos enlaces en {site.name} son enlaces de afiliado. Si abres una cuenta a través de uno, el
+      operador puede pagarnos una comisión. No cambia el precio que pagas, y no cambia una puntuación —
+      nuestra rúbrica es pública y se aplica antes de que exista cualquier relación comercial.
+    </div>
+
+    <h2>Programas en los que participamos</h2>
+    <p>
+      Solicitamos programas de afiliados después de que una plataforma haya sido evaluada, no antes. Una
+      plataforma que se niega a trabajar con nosotros conserva su puntuación; una que paga más no gana una.
+    </p>
+    <ul>
+      {platforms.map((p) => (
+        <li>
+          <strong>{p.name}</strong> — {p.affiliateUrl ? 'aprobado, enlaces rastreados en uso' : 'solicitud pendiente; aún no hay ningún enlace rastreado activo en este sitio'}
+        </li>
+      ))}
+    </ul>
+
+    <h2>Cómo se marcan los enlaces</h2>
+    <p>
+      Todo enlace comercial saliente lleva <code>rel="sponsored nofollow"</code>. Los enlaces dentro del
+      texto editorial que no son comerciales quedan como enlaces normales. Si encuentras un enlace
+      comercial sin marcar, es un error — por favor, repórtalo.
+    </p>
+
+    <h2>Lo que no haremos</h2>
+    <ul>
+      <li>Publicar una afirmación de "ganancia garantizada" o "sin riesgo" sobre ningún producto de apuestas.</li>
+      <li>Ocultar el hecho de que la mayoría de los apostadores minoristas pierden dinero con el tiempo.</li>
+      <li>Posicionar una plataforma más alto porque paga una comisión más alta.</li>
+      <li>Hacer una reseña de una plataforma que no tenemos forma de verificar.</li>
+    </ul>
+
+    <h2>Advertencia de riesgo</h2>
+    <p>
+      Los mercados de predicción y las apuestas deportivas no son inversiones. Apostar dinero a un resultado
+      puede perder la apuesta completa. Nada en este sitio es asesoramiento financiero, legal o fiscal, y nada
+      aquí es una recomendación para apostar. Consulta <a href="/es/responsible-gambling">juego responsable</a>.
+    </p>
+  </section>
+</BaseLayout>

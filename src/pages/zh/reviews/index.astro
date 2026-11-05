@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { bySlug } from '@/data/platforms'
+
+const collections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
+const all = await Promise.all(
+  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.lang === 'zh' && data.kind === 'review')),
+)
+const entries = all
+  .flat()
+  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+
+const hrefFor = (e: { id: string; collection: string }) =>
+  `/zh/${e.collection}/${e.id}`
+
+const groups = [
+  { type: 'prediction-market' as const, label: '预测市场' },
+  { type: 'sportsbook' as const, label: '体育博彩平台' },
+]
+---
+
+<BaseLayout
+  title="平台评测：预测市场和体育博彩（中文）"
+  description="预测市场和持牌体育博彩平台的完整评测。每一篇都列出费用、提款条款、牌照，以及我们没法核实的地方。"
+  path="/zh/reviews"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">评测</span>
+      <h1>每一篇评测，都把缺点讲清楚</h1>
+      <p class="lede">
+        不列缺点的评测就是广告。我们按一套固定的标准打分，并公开每一项的分数，让你可以具体地反对它。
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {groups.map((g) => {
+      const items = entries.filter((e) => bySlug(e.data.platformSlug)?.type === g.type)
+      if (!items.length) return null
+      return (
+        <div style="margin-top:40px;">
+          <h2>{g.label}</h2>
+          <div class="grid">
+            {items.map((e) => (
+              <article class="card card-link">
+                <span class="meta">更新于 {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+                <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
+                <p>{e.data.verdict}</p>
+                <div class="small muted" style="font-size:.82rem;">
+                  <div><strong>最适合：</strong> {e.data.bestFor}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )
+    })}
+
+    {entries.length === 0 && (
+      <p class="muted">评测内容正在逐步撰写中，敬请期待。</p>
+    )}
+  </section>
+</BaseLayout>

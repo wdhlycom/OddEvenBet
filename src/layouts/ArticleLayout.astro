@@ -1,0 +1,66 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import AuthorBox from '@/components/AuthorBox.astro'
+import { site } from '@/data/site'
+
+interface Crumb { label: string; href: string }
+
+interface Props {
+  title: string
+  /** On-page H1. Often longer/more natural than the <title>. */
+  heading: string
+  description: string
+  path: string
+  section: string
+  sectionHref: string
+  updated: Date
+  author: string
+  /** Shows "By ... · Updated ..." line under the H1. */
+  showByline?: boolean
+  schema?: Record<string, unknown>[]
+}
+
+const {
+  title, heading, description, path, section, sectionHref,
+  updated, author, showByline = true, schema = [],
+} = Astro.props
+
+const crumbs: Crumb[] = [
+  { label: 'Home', href: '/' },
+  { label: section, href: sectionHref },
+  { label: heading, href: path },
+]
+
+const dateLabel = updated.toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+})
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <header class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">{section}</span>
+      <h1>{heading}</h1>
+      {showByline && (
+        <p class="muted small" style="margin: 14px 0 0;">
+          By {author} · Updated {dateLabel}
+          {' · '}
+          <a href="/methodology">How we research this</a>
+        </p>
+      )}
+    </div>
+  </header>
+
+  <article class="wrap" style="padding-block: 32px 20px;">
+    <Breadcrumbs items={crumbs} />
+
+    <div class="prose measure">
+      <slot />
+    </div>
+
+    <div class="measure">
+      <AuthorBox name={author} />
+    </div>
+  </article>
+</BaseLayout>

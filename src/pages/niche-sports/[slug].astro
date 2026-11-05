@@ -1,0 +1,231 @@
+---
+import { getCollection, render } from 'astro:content'
+import ArticleLayout from '@/layouts/ArticleLayout.astro'
+import ScoreCard from '@/components/ScoreCard.astro'
+import AffiliateCTA from '@/components/AffiliateCTA.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import CompareTable from '@/components/CompareTable.astro'
+import FAQ from '@/components/FAQ.astro'
+import { bySlug, ranked } from '@/data/platforms'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('niche-sports', ({ data }) => !data.draft)
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const d = entry.data
+const path = `/niche-sports/${entry.id}`
+const section = 'Niche Sports'
+const sectionHref = '/niche-sports'
+
+// ---- kind-specific derived data ----
+let schema: Record<string, unknown>[] = []
+let reviewPlatform: ReturnType<typeof bySlug> = undefined
+let list: ReturnType<typeof ranked> = []
+let left: ReturnType<typeof bySlug> = undefined
+let right: ReturnType<typeof bySlug> = undefined
+let winner: 'left' | 'right' = 'left'
+let linked: ReturnType<typeof bySlug>[] = []
+
+const related = (await getCollection('niche-sports', ({ data, id }) =>
+  d.related.includes(id) && !data.draft,
+))
+
+if (d.kind === 'review') {
+  reviewPlatform = bySlug(d.platformSlug)
+  if (!reviewPlatform) {
+    throw new Error(`Review "${entry.id}" references platformSlug "${d.platformSlug}" not in platforms.ts`)
+  }
+  schema = [{
+    '@type': 'Review',
+    name: d.title,
+    description: d.description,
+    dateModified: d.updated.toISOString(),
+    author: { '@type': 'Person', name: d.author },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: Object.values(reviewPlatform.scores).reduce((a, b) => a + b, 0) / 6,
+      bestRating: 10,
+      worstRating: 0,
+    },
+    itemReviewed: { '@type': 'Organization', name: reviewPlatform.name },
+  }]
+}
+
+if (d.kind === 'compare') {
+  left = bySlug(d.left)
+  right = bySlug(d.right)
+  if (!left || !right) throw new Error(`Comparison "${entry.id}" references unknown platform slug`)
+  winner = d.winner === d.left ? 'left' : 'right'
+  schema = [{ '@type': 'Article', headline: d.title, description: d.description, dateModified: d.updated.toISOString(), author: { '@type': 'Person', name: d.author } }]
+}
+
+if (d.kind === 'best') {
+  list = ranked(d.scope === 'all' ? undefined : d.scope)
+  schema = [{
+    '@type': 'ItemList',
+    name: d.title,
+    description: d.description,
+    itemListElement: list.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name })),
+  }]
+}
+
+if (d.kind === 'guide') {
+  linked = d.platforms.map(bySlug).filter(Boolean)
+  schema = [{
+    '@type': 'HowTo',
+    name: d.title,
+    description: d.description,
+    dateModified: d.updated.toISOString(),
+    step: d.steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, text: s })),
+  }]
+}
+---
+
+<ArticleLayout
+  title={d.title}
+  heading={d.title}
+  description={d.description}
+  path={path}
+  section={section}
+  sectionHref={sectionHref}
+  updated={d.updated}
+  author={d.author}
+  schema={schema}
+>
+  {d.kind === 'review' && reviewPlatform && (
+    <>
+      <div class="callout">
+        <strong>Verdict</strong>
+        {d.verdict}
+      </div>
+
+      <div style="margin:1.6em 0;">
+        <AffiliateCTA
+          url={d.affiliate ? reviewPlatform.affiliateUrl : null}
+          platformName={reviewPlatform.name}
+          label={`Open ${reviewPlatform.name}`}
+        />
+      </div>
+
+      <h2>At a glance</h2>
+      <div class="table-scroll">
+        <table>
+          <tbody>
+            <tr><th scope="row">Fees</th><td>{reviewPlatform.fees}</td></tr>
+            <tr><th scope="row">Minimum deposit</th><td>{reviewPlatform.minDeposit}</td></tr>
+            <tr><th scope="row">Payout methods</th><td>{reviewPlatform.payoutMethods}</td></tr>
+            <tr><th scope="row">Payout speed</th><td>{reviewPlatform.payoutSpeed}</td></tr>
+            <tr><th scope="row">Licensing</th><td>{reviewPlatform.licence}</td></tr>
+            <tr><th scope="row">Available in</th><td>{reviewPlatform.regions.join(', ')}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ScoreCard scores={reviewPlatform.scores} />
+
+      <div class="pros-cons">
+        <div>
+          <h4>What works</h4>
+          <ul>{d.pros.map((t) => <li>{t}</li>)}</ul>
+        </div>
+        <div>
+          <h4>What doesn't</h4>
+          <ul>{d.cons.map((t) => <li>{t}</li>)}</ul>
+        </div>
+      </div>
+
+      <div class="callout callout--warn">
+        <strong>Who should skip it</strong>
+        {d.notFor}
+      </div>
+
+      <Content />
+    </>
+  )}
+
+  {d.kind === 'compare' && left && right && (
+    <>
+      <div class="callout">
+        <strong>Winner: {winner === 'left' ? left.name : right.name}</strong>
+        {d.verdict}
+      </div>
+
+      <CompareTable leftName={left.name} rightName={right.name} rows={d.rows} winner={winner} />
+
+      <Content />
+
+      <h2>Both platforms, scored</h2>
+      <div class="grid">
+        <PlatformCard platform={left} />
+        <PlatformCard platform={right} />
+      </div>
+    </>
+  )}
+
+  {d.kind === 'best' && (
+    <>
+      <p class="muted small">For {d.audience}</p>
+
+      <div class="callout">
+        <strong>How this list is ordered</strong>
+        {d.criteria}
+      </div>
+
+      <Content />
+
+      <div class="grid" style="margin-top:2em;">
+        {list.map((p, i) => (
+          <PlatformCard platform={p} rank={i + 1} />
+        ))}
+      </div>
+    </>
+  )}
+
+  {d.kind === 'guide' && (
+    <>
+      <p class="muted small" style="margin-bottom:1.5em;">
+        For {d.audience} · {d.level} level
+      </p>
+
+      {d.steps.length > 0 && (
+        <div class="callout">
+          <strong>What this covers</strong>
+          <ol style="margin:8px 0 0;">
+            {d.steps.map((s) => <li>{s}</li>)}
+          </ol>
+        </div>
+      )}
+
+      <Content />
+
+      {linked.length > 0 && (
+        <>
+          <h2>Platforms mentioned</h2>
+          <div class="grid">
+            {linked.map((p) => p && <PlatformCard platform={p} />)}
+          </div>
+        </>
+      )}
+    </>
+  )}
+
+  {d.kind === 'explainer' && (
+    <>
+      <Content />
+
+      {related.length > 0 && (
+        <div style="margin-top:2.5em;">
+          <h2>Keep reading</h2>
+          <ul>
+            {related.map((r) => (
+              <li><a href={`/niche-sports/${r.id}`}>{r.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  )}
+</ArticleLayout>

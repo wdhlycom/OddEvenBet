@@ -1,0 +1,40 @@
+---
+interface Row { label: string; left: string; right: string }
+interface Props {
+  leftName: string
+  rightName: string
+  rows: Row[]
+  /** Highlights the winning column header. */
+  winner?: 'left' | 'right'
+  /** Language for labels. Defaults to English; pass "zh" for Chinese. */
+  lang?: 'en' | 'zh'
+}
+
+const { leftName, rightName, rows, winner, lang = 'en' } = Astro.props
+const attribute = lang === 'zh' ? '项目' : 'Attribute'
+---
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{attribute}</th>
+        <th scope="col" style={winner === 'left' ? 'color:var(--accent)' : undefined}>
+          {leftName}{winner === 'left' ? ' ✓' : ''}
+        </th>
+        <th scope="col" style={winner === 'right' ? 'color:var(--accent)' : undefined}>
+          {rightName}{winner === 'right' ? ' ✓' : ''}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.label}</th>
+          <td>{r.left}</td>
+          <td>{r.right}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

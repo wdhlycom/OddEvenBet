@@ -1,0 +1,21 @@
+{
+  "name": "odds-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "build:index": "pagefind --site dist",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^5.13.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.6.0"
+  }
+}

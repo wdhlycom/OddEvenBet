@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="About"
+  description="Who writes this site, what we cover, and the rules we hold ourselves to. Independent research on prediction markets and licensed sportsbooks."
+  path="/about"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">About</span>
+      <h1>What this site is for</h1>
+      <p class="lede">
+        {site.name} exists to answer one question well: given what you actually want to do,
+        which platform is the least bad fit — and what will it cost you to find out?
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="about" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>What we cover</h2>
+    <ul>
+      <li><strong>Prediction markets</strong> — event contracts where the price is a probability.</li>
+      <li><strong>Licensed sportsbooks</strong> — regulated operators in the UK, EU, US, Canada and Latin America.</li>
+    </ul>
+    <p>
+      We deliberately do not cover unlicensed books, "guaranteed return" schemes, or any product
+      that cannot name its regulator.
+    </p>
+
+    <h2>How we work</h2>
+    <p>
+      Every page has a named author and an "Updated" date. Scores follow a{' '}
+      <a href="/methodology">published rubric</a>. Where we could not verify something — a payout
+      timeline, a licence number, a fee at low probability — the page says so instead of guessing.
+    </p>
+
+    <h2>Who writes it</h2>
+    <p>
+      The site is edited by {site.name}'s research desk. We are not affiliated with any operator
+      we review. Commercial relationships are disclosed on every page that carries one, and in
+      full on the <a href="/disclosure">disclosure page</a>.
+    </p>
+
+    <h2>Corrections and contact</h2>
+    <p>
+      Errors get fixed and dated. If something here is wrong, tell us — correcting a fee table is
+      more useful to us than a compliment.
+    </p>
+  </section>
+</BaseLayout>

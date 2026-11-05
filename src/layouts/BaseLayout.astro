@@ -1,0 +1,134 @@
+---
+import Header from '@/components/Header.astro'
+import Footer from '@/components/Footer.astro'
+import { site, locales } from '@/data/site'
+import '@/styles/global.css'
+
+interface Props {
+  title: string
+  description: string
+  /** Path only, e.g. "/learn/what-is-x". Canonical is derived from site.domain. */
+  path: string
+  /** Optional language code. Defaults to "en" (no prefix). */
+  lang?: 'en' | 'zh' | 'es'
+  /** Extra JSON-LD nodes for this page. */
+  schema?: Record<string, unknown>[]
+  noindex?: boolean
+}
+
+const { title, description, path, lang = 'en', schema = [], noindex = false } = Astro.props
+const canonical = new URL(path, site.domain).href
+const pageTitle = path === '/' ? title : `${title} — ${site.name}`
+
+// Strip any language prefix to build sibling URLs for hreflang alternates.
+const pathNoLang = path.replace(/^\/(zh|es)(?=\/|$)/, '') || '/'
+
+const siteGraph = [
+  {
+    '@type': 'Organization',
+    '@id': `${site.domain}/#org`,
+    name: site.name,
+    url: site.domain,
+    description: site.description,
+  },
+  {
+    '@type': 'WebSite',
+    '@id': `${site.domain}/#site`,
+    url: site.domain,
+    name: site.name,
+    publisher: { '@id': `${site.domain}/#org` },
+    inLanguage: site.locale,
+  },
+]
+---
+
+<!doctype html>
+<html lang={lang} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <script is:inline>
+      // Apply theme before first paint to avoid a flash of wrong-colour content.
+      (function () {
+        var s = localStorage.getItem('theme')
+        var d = window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = s || (d ? 'dark' : 'light')
+      })()
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=General+Sans:wght@600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    {locales.map((l) => (
+      <link
+        rel="alternate"
+        hreflang={l.code}
+        href={new URL(l.prefix + pathNoLang, site.domain).href}
+      />
+    ))}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {site.twitter && <meta name="twitter:site" content={site.twitter} />}
+
+    <link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': [...siteGraph, ...schema] })}
+    />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <div class="disclosure-strip">
+      <div class="wrap">{site.disclosureShort}</div>
+    </div>
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // ---- Inline term disclosure (展开式术语注解) ----
+      // 点一下术语展开解释，再点收起；点击页面其他处自动收起。全站通用。
+      const terms = document.querySelectorAll('.term')
+      terms.forEach((term) => {
+        term.setAttribute('role', 'button')
+        term.setAttribute('tabindex', '0')
+        term.setAttribute('aria-expanded', 'false')
+        const toggle = (e) => {
+          e.stopPropagation()
+          const open = term.getAttribute('aria-expanded') === 'true'
+          // 收起其他所有已展开的术语，一次只开一个
+          terms.forEach((t) => t.setAttribute('aria-expanded', 'false'))
+          term.setAttribute('aria-expanded', String(!open))
+        }
+        term.addEventListener('click', toggle)
+        term.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            toggle(e)
+          }
+        })
+      })
+      // 点击术语之外的地方，收起所有注解
+      document.addEventListener('click', () => {
+        terms.forEach((t) => t.setAttribute('aria-expanded', 'false'))
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+---
+import type { Platform } from '@/data/platforms'
+import { localized } from '@/data/platforms'
+import AffiliateCTA from './AffiliateCTA.astro'
+
+interface Props {
+  platform: Platform
+  /** 1-based position, shown as a badge on ranking pages. */
+  rank?: number
+  /** Whether a published review exists to link to. */
+  reviewSlug?: string
+  /** Language for labels. Defaults to English; pass "zh" for Chinese. */
+  lang?: 'en' | 'zh'
+}
+
+const { platform: p, rank, reviewSlug, lang = 'en' } = Astro.props
+const score = Object.values(p.scores).reduce((a, b) => a + b, 0) / Object.keys(p.scores).length
+
+const t = lang === 'zh'
+  ? { fees: '手续费', payout: '出金', licence: '牌照', open: '打开' }
+  : { fees: 'Fees', payout: 'Payout', licence: 'Licence', open: 'Open' }
+---
+
+<article class="card">
+  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+    <h3>
+      {rank && <span class="muted" style="margin-right:6px;">#{rank}</span>}
+      {reviewSlug ? <a href={reviewSlug}>{p.name}</a> : p.name}
+    </h3>
+    <span class="score">{score.toFixed(1)}<small>/10</small></span>
+  </div>
+
+  <p>{localized(p, 'oneLiner', lang)}</p>
+
+  <div class="small muted" style="display:grid; gap:4px; font-size:.82rem;">
+    <div><strong>{t.fees}:</strong> {localized(p, 'fees', lang)}</div>
+    <div><strong>{t.payout}:</strong> {localized(p, 'payoutSpeed', lang)}</div>
+    <div><strong>{t.licence}:</strong> {localized(p, 'licence', lang)}</div>
+  </div>
+
+  <div style="margin-top:auto; padding-top:8px;">
+    <AffiliateCTA url={p.affiliateUrl} platformName={p.name} label={`${t.open} ${p.name}`} />
+  </div>
+</article>

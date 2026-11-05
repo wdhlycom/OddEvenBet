@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Sobre nosotros"
+  description="Quién escribe este sitio, qué cubrimos y las reglas que nos imponemos. Investigación independiente sobre mercados de predicción y casas de apuestas con licencia."
+  path="/es/about"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Sobre</span>
+      <h1>Para qué es este sitio</h1>
+      <p class="lede">
+        {site.name} existe para responder bien una sola pregunta: dado lo que realmente quieres hacer,
+        ¿qué plataforma es el mal menor — y cuánto te costará averiguarlo?
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="about" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>Qué cubrimos</h2>
+    <ul>
+      <li><strong>Mercados de predicción</strong> — contratos de eventos donde el precio es una probabilidad.</li>
+      <li><strong>Casas de apuestas con licencia</strong> — operadores regulados en Reino Unido, UE, EE. UU., Canadá y América Latina.</li>
+    </ul>
+    <p>
+      Deliberadamente no cubrimos casas sin licencia, esquemas de "retorno garantizado", ni ningún
+      producto que no pueda nombrar a su regulador.
+    </p>
+
+    <h2>Cómo trabajamos</h2>
+    <p>
+      Cada página tiene un autor con nombre y una fecha de "Actualizado". Las puntuaciones siguen una{' '}
+      <a href="/es/methodology">rúbrica publicada</a>. Donde no pudimos verificar algo — un plazo de pago,
+      un número de licencia, una comisión a baja probabilidad — la página lo dice en lugar de adivinar.
+    </p>
+
+    <h2>Quién lo escribe</h2>
+    <p>
+      El sitio lo edita el equipo de investigación de {site.name}. No estamos afiliados a ningún operador
+      que evaluamos. Las relaciones comerciales se divulgan en cada página que las contiene, y de forma
+      completa en la <a href="/es/disclosure">página de divulgación</a>.
+    </p>
+
+    <h2>Correcciones y contacto</h2>
+    <p>
+      Los errores se corrigen y se fechan. Si algo aquí está mal, dínoslo — corregir una tabla de
+      comisiones nos es más útil que un elogio.
+    </p>
+  </section>
+</BaseLayout>

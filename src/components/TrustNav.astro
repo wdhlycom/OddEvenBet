@@ -1,0 +1,50 @@
+---
+import { locales } from '@/data/site'
+
+interface Props {
+  /** Slug of the current page, e.g. 'methodology'. It is excluded from the list. */
+  current: string
+}
+
+const { current } = Astro.props
+
+const path = Astro.url.pathname
+const activeLocale =
+  locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
+  locales[0]
+const prefix = activeLocale.prefix
+
+const pages: Record<'en' | 'zh' | 'es', { slug: string; title: string; desc: string }[]> = {
+  en: [
+    { slug: 'about', title: 'About', desc: 'What this site is for, who writes it, and the rules we hold ourselves to.' },
+    { slug: 'methodology', title: 'Methodology', desc: 'The scoring rubric behind every number on this site.' },
+    { slug: 'disclosure', title: 'Disclosure', desc: 'Who pays us, and what that does and does not change.' },
+    { slug: 'responsible-gambling', title: 'Responsible Gambling', desc: 'Limits, warning signs, and where to get help.' },
+  ],
+  zh: [
+    { slug: 'about', title: '关于我们', desc: '这个网站是做什么的、谁在写、我们对自己的要求。' },
+    { slug: 'methodology', title: '评测方法', desc: '本站每一个数字背后的评分标准。' },
+    { slug: 'disclosure', title: '利益披露', desc: '谁付钱给我们，以及这改变了什么、没改变什么。' },
+    { slug: 'responsible-gambling', title: '负责任博彩', desc: '限额、预警信号，以及去哪里求助。' },
+  ],
+  es: [
+    { slug: 'about', title: 'Sobre nosotros', desc: 'Para qué es este sitio, quién lo escribe y las reglas que nos imponemos.' },
+    { slug: 'methodology', title: 'Metodología', desc: 'La rúbrica de puntuación detrás de cada número de este sitio.' },
+    { slug: 'disclosure', title: 'Divulgación', desc: 'Quién nos paga, y qué cambia y qué no.' },
+    { slug: 'responsible-gambling', title: 'Juego responsable', desc: 'Límites, señales de alerta y dónde buscar ayuda.' },
+  ],
+}
+
+const items = pages[activeLocale.code].filter((p) => p.slug !== current)
+---
+
+<section class="wrap" style="padding-block:40px 8px;">
+  <div class="grid">
+    {items.map((l) => (
+      <article class="card card-link">
+        <h3><a href={prefix + '/' + l.slug}>{l.title}</a></h3>
+        <p>{l.desc}</p>
+      </article>
+    ))}
+  </div>
+</section>

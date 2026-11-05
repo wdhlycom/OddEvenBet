@@ -1,0 +1,52 @@
+---
+/**
+ * The only place in the codebase that emits an outbound commercial link.
+ * Centralising it guarantees every affiliate link carries
+ * rel="sponsored nofollow noopener" — which is both an FTC and a Google
+ * requirement. If `affiliateUrl` is missing the button becomes inert text
+ * instead of a dead link, so an unreleased programme never hurts the page.
+ */
+import { site } from '@/data/site'
+
+interface Props {
+  url: string | null
+  label?: string
+  /** Small print under the button. Defaults to the site-wide disclosure. */
+  note?: string
+  variant?: 'solid' | 'ghost'
+  platformName?: string
+}
+
+const {
+  url,
+  label = 'Visit site',
+  note,
+  variant = 'solid',
+  platformName,
+} = Astro.props
+
+const cls = variant === 'ghost' ? 'cta cta--ghost' : 'cta'
+---
+
+<div>
+  {url ? (
+    <a
+      class={cls}
+      href={url}
+      target="_blank"
+      rel="sponsored nofollow noopener"
+      data-affiliate={platformName ?? 'true'}
+    >
+      {label}
+      <span aria-hidden="true">→</span>
+    </a>
+  ) : (
+    <span class={cls} aria-disabled="true" style="opacity:.55; cursor:not-allowed;">
+      {label}
+      <span aria-hidden="true">→</span>
+    </span>
+  )}
+  <span class="cta-note">
+    {note ?? (url ? site.disclosureShort : 'Link not yet live — this programme is pending approval.')}
+  </span>
+</div>

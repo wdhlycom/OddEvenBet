@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const entries = (await getCollection('learn', ({ data }) => !data.draft && data.lang === 'es'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const topics = ['getting-started', 'betting-basics', 'betting-strategy', 'mindset'] as const
+const topicLabels: Record<(typeof topics)[number], string> = {
+  'getting-started': 'Para empezar',
+  'betting-basics': 'Conceptos básicos',
+  'betting-strategy': 'Estrategia',
+  'mindset': 'Riesgo y mentalidad',
+}
+const grouped = topics
+  .map((t) => ({ topic: t, items: entries.filter((e) => e.data.topic === t) }))
+  .filter((g) => g.items.length)
+---
+
+<BaseLayout
+  title="Aprende: mercados de predicción (español)"
+  description="Explicaciones claras sobre mercados de predicción, contratos de evento, comisiones, liquidez y liquidación. Contenido original en español, no una traducción."
+  path="/es/learn"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Aprende</span>
+      <h1>Cómo funciona realmente este mercado</h1>
+      <p class="lede">
+        Páginas de definiciones, escritas antes que cualquier otra cosa en este sitio. El contenido
+        en español se redacta de forma original, no como traducción literal del inglés.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {grouped.map((g) => (
+      <div style="margin-top:40px;">
+        <h2 style="text-transform:none;">
+          <a href={`/es/learn/topic/${g.topic}`} style="text-decoration:none;color:inherit;">{topicLabels[g.topic]}</a>
+        </h2>
+        <div class="grid">
+          {g.items.map((e) => (
+            <article class="card card-link">
+              <h3><a href={`/es/learn/${e.id}`}>{e.data.question}</a></h3>
+              <p>{e.data.answer}</p>
+              <span class="meta">{e.data.updated.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    ))}
+    {entries.length === 0 && (
+      <p class="muted">El contenido en español se está redactando poco a poco.</p>
+    )}
+  </section>
+</BaseLayout>

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { locales } from '@/data/site'
+
+const path = Astro.url.pathname
+const activeLocale =
+  locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
+  locales[0]
+const prefix = activeLocale.prefix
+
+// Strip the language prefix to build a fallback link to the English (root) version.
+const pathNoLang = path.replace(/^\/(zh|es)(?=\/|$)/, '') || '/'
+
+const copy =
+  activeLocale.code === 'zh'
+    ? {
+        eyebrow: '404',
+        heading: '这一页还没有中文版',
+        note: '你正在浏览中文版，但这个页面还没有对应的中文内容。',
+        fallback: '查看英文版',
+        home: '回到首页',
+        learn: '浏览入门解释',
+      }
+    : activeLocale.code === 'es'
+      ? {
+          eyebrow: '404',
+          heading: 'Esta página aún no está en español',
+          note: 'Estás viendo la versión en español, pero esta página aún no tiene contenido en español.',
+          fallback: 'Ver la versión en inglés',
+          home: 'Ir a la página de inicio',
+          learn: 'Explorar las guías',
+        }
+      : {
+          eyebrow: '404',
+          heading: "That page isn't here",
+          note: 'It may have been renamed, or the link may be out of date.',
+          fallback: '',
+          home: 'Go to the homepage',
+          learn: 'Browse the explainers',
+        }
+---
+
+<BaseLayout title="Page not found" description="That page does not exist." path="/404" noindex>
+  <section class="wrap measure" style="padding-block:96px;">
+    <span class="eyebrow">{copy.eyebrow}</span>
+    <h1>{copy.heading}</h1>
+    <p class="muted">{copy.note}</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:24px;">
+      {copy.fallback && (
+        <a class="cta" href={pathNoLang}>{copy.fallback}</a>
+      )}
+      <a class="cta cta--ghost" href={prefix + '/'}>{copy.home}</a>
+      <a class="cta cta--ghost" href={prefix + '/learn'}>{copy.learn}</a>
+    </div>
+  </section>
+</BaseLayout>

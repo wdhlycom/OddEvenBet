@@ -1,0 +1,69 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site, scoreDimensions } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Methodology: how we score platforms"
+  description="Our full scoring rubric, where the data comes from, what we verify ourselves and what we cannot. Published so a reader can recompute any score on the site."
+  path="/methodology"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Trust</span>
+      <h1>Methodology</h1>
+      <p class="lede">
+        Published {new Date().getFullYear()}. This page is the contract behind every score on
+        {' '}{site.name}. If a rating cannot be traced back to something on this page, treat it as an error.
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="methodology" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>What we score, and how much it counts</h2>
+    <p>
+      Six dimensions, weighted. The weights are fixed and published so that changing a score
+      requires changing a specific piece of evidence, not just an opinion.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Dimension</th><th scope="col">Weight</th><th scope="col">What moves it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fees &amp; payout structure</td><td>20%</td><td>Published fee schedule, spread behaviour at 10% / 50% / 90% probability, withdrawal costs</td></tr>
+          <tr><td>Market depth &amp; liquidity</td><td>20%</td><td>Order book depth within 2 cents of mid, slippage on a $500 order</td></tr>
+          <tr><td>Usability</td><td>20%</td><td>Account opening steps, market discovery, mobile behaviour, clarity of settlement rules</td></tr>
+          <tr><td>Licensing &amp; fund safety</td><td>20%</td><td>Named regulator, segregation of client funds, corporate entity traceability</td></tr>
+          <tr><td>Payout speed &amp; methods</td><td>10%</td><td>Documented timelines, available rails, complaint volume</td></tr>
+          <tr><td>Support &amp; dispute handling</td><td>10%</td><td>First-response time, whether disputes route to a named arbiter</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Where the data comes from</h2>
+    <ul>
+      <li><strong>Primary:</strong> the platform's own published fee schedule, terms and regulatory filings.</li>
+      <li><strong>Secondary:</strong> order book readings taken on the date stated on each page.</li>
+      <li><strong>Tertiary:</strong> user complaint patterns across public review platforms. We treat these as a signal to investigate, never as evidence on their own.</li>
+    </ul>
+
+    <h2>What we do not do</h2>
+    <ul>
+      <li>We do not accept payment, free credit or "review fees" for a rating or a position in a list.</li>
+      <li>We do not publish a review without at least one stated drawback.</li>
+      <li>We do not claim to have traded a platform we only read about. Where a page is research-only, it says so.</li>
+    </ul>
+
+    <h2>Corrections</h2>
+    <p>
+      If a fee, licence or payout term changes, the page is updated and the "Updated" date moves.
+      Substantive corrections are noted in the page body rather than silently edited. To flag an
+      error, use the contact link in the footer.
+    </p>
+  </section>
+</BaseLayout>

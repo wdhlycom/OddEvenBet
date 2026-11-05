@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import { platforms } from '@/data/platforms'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="联盟利益披露"
+  description="这个网站怎么赚钱、我们参加哪些联盟计划，以及当一个商业链接挨着一个推荐出现时，我们对自己的要求。"
+  path="/zh/disclosure"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">信任</span>
+      <h1>联盟利益披露</h1>
+    </div>
+  </section>
+
+  <TrustNav current="disclosure" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout">
+      <strong>一句话版本</strong>
+      {site.name} 上有些链接是联盟链接。如果你通过它开了一个账户，运营方可能会付我们一笔佣金。它不会改变你付的价格，也不会改变一个分数——我们的评分标准是公开的，而且在任何商业关系存在之前就已经定好了。
+    </div>
+
+    <h2>我们参加哪些计划</h2>
+    <p>
+      我们是在一个平台被评测完之后才去申请联盟计划，不是之前。一个拒绝跟我们合作的平台，分数照旧；一个付得更多的平台，也不会因此涨分。
+    </p>
+    <ul>
+      {platforms.map((p) => (
+        <li>
+          <strong>{p.name}</strong> — {p.affiliateUrl ? '已通过，使用中的追踪链接' : '申请中，本站目前没有任何追踪链接生效'}
+        </li>
+      ))}
+    </ul>
+
+    <h2>链接怎么标记</h2>
+    <p>
+      每一个外链商业链接都带 <code>rel="sponsored nofollow"</code>。正文里非商业的普通链接就保持普通链接。如果你发现一个商业链接没标记，那是 bug——请告诉我们。
+    </p>
+
+    <h2>我们不会做什么</h2>
+    <ul>
+      <li>不发任何「保本盈利」或「零风险」的博彩产品宣传。</li>
+      <li>不隐瞒「大多数散户长期是亏钱的」这个事实。</li>
+      <li>不因为平台给的佣金更高就把它排得更靠前。</li>
+      <li>不做我们没法核实的平台的评测。</li>
+    </ul>
+
+    <h2>风险提示</h2>
+    <p>
+      预测市场和体育博彩不是投资。把本金押在一个结果上，可能亏掉全部本金。本站任何内容都不构成金融、法律或税务建议，也不构成任何下注建议。请看<a href="/zh/responsible-gambling">负责任博彩</a>。
+    </p>
+  </section>
+</BaseLayout>

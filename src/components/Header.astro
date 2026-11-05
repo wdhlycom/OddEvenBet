@@ -1,0 +1,91 @@
+---
+import { site, nav, locales } from '@/data/site'
+import Search from './Search.astro'
+
+const path = Astro.url.pathname
+
+// Detect the active language from the URL prefix, so the switcher can highlight
+// the current locale and offer correct sibling links. Handles both "/zh" and "/zh/foo".
+const activeLocale =
+  locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
+  locales[0]
+
+// Path without the language prefix. On a locale root (e.g. "/zh") this is "",
+// so sibling links build as "/zh" rather than "/zh/" (trailingSlash: never).
+const basePath = activeLocale.prefix ? path.slice(activeLocale.prefix.length) : (path === '/' ? '' : path)
+
+// Build a sibling URL for another locale. An empty basePath means "home".
+const siblingHref = (prefix: string) => {
+  const target = prefix + basePath
+  return target === '' ? '/' : target
+}
+
+const homeHref = activeLocale.prefix || '/'
+---
+
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href={homeHref}>{site.name}<span>.</span></a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {nav.map((item) => (
+        <a
+          href={activeLocale.prefix + item.href}
+          aria-current={path.startsWith(activeLocale.prefix + item.href) ? 'page' : undefined}
+        >
+          {activeLocale.code === 'zh' ? item.labelZh : item.label}
+        </a>
+      ))}
+      {activeLocale.code === 'zh' && (
+        <a
+          href="/zh/glossary"
+          aria-current={path.startsWith('/zh/glossary') ? 'page' : undefined}
+        >
+          术语表
+        </a>
+      )}
+    </nav>
+
+    <div class="head-controls">
+      <Search lang={activeLocale.code} />
+
+      <button
+        class="theme-toggle"
+        type="button"
+        id="theme-toggle"
+        aria-label="Toggle dark mode"
+        title="Toggle dark mode"
+      >
+        <span class="theme-icon" data-theme-icon>◐</span>
+      </button>
+
+      <label class="lang-switch" aria-label="Language">
+        <select id="lang-select">
+          {locales.map((l) => (
+            <option value={siblingHref(l.prefix)} selected={l.code === activeLocale.code}>
+              {l.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  </div>
+</header>
+
+<script>
+  // ---- Theme toggle ----
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const current = document.documentElement.dataset.theme
+    const next = current === 'dark' ? 'light' : 'dark'
+    document.documentElement.dataset.theme = next
+    localStorage.setItem('theme', next)
+  })
+
+  // ---- Language switch ----
+  document.getElementById('lang-select')?.addEventListener('change', (e) => {
+    const target = (e.target as HTMLSelectElement).value
+    if (target && target !== window.location.pathname) {
+      window.location.href = target
+    }
+  })
+</script>

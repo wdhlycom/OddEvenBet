@@ -1,0 +1,61 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Juego responsable"
+  description="Advertencias de riesgo, herramientas de autoexclusión, límites de depósito y líneas de ayuda para Reino Unido, EE. UU., Canadá, Australia y la UE. Apostar no es una forma de ganar dinero."
+  path="/es/responsible-gambling"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Seguridad</span>
+      <h1>Juego responsable</h1>
+    </div>
+  </section>
+
+  <TrustNav current="responsible-gambling" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout callout--warn">
+      <strong>La aritmética incómoda</strong>
+      En las casas de apuestas reguladas, la mayoría de las cuentas minoristas pierden dinero en un año.
+      En los mercados de predicción ocurre lo mismo: la mayoría de los participantes quedan en negativo
+      después de comisiones. Cualquier contenido que implique lo contrario — incluido el nuestro, si algún
+      día nos equivocamos — debe tratarse como marketing.
+    </div>
+
+    <h2>Señales de alerta</h2>
+    <ul>
+      <li>Apostar para recuperar una pérdida anterior en lugar de por una opinión que sostienes.</li>
+      <li>Perseguir un mercado después de que la liquidación ya se movió en tu contra.</li>
+      <li>Ocultar apuestas o pérdidas a las personas cercanas a ti.</li>
+      <li>Apostar dinero reservado para el alquiler, la comida o el pago de deudas.</li>
+    </ul>
+
+    <h2>Herramientas que realmente funcionan</h2>
+    <ul>
+      <li><strong>Límites de depósito</strong> — configúralos antes de tu primer depósito, cuando todavía piensas con claridad.</li>
+      <li><strong>Períodos de pausa</strong> — de 24 horas a 6 semanas, aplicados por el operador, no por tu fuerza de voluntad.</li>
+      <li><strong>Autoexclusión</strong> — los esquemas nacionales de abajo te eliminan de varios operadores a la vez.</li>
+    </ul>
+
+    <h2>Dónde obtener ayuda</h2>
+    <ul>
+      <li><strong>Reino Unido</strong> — GamCare (gamcare.org.uk), GAMSTOP para autoexclusión.</li>
+      <li><strong>EE. UU.</strong> — 1-800-GAMBLER, o el registro de autoexclusión de tu estado.</li>
+      <li><strong>Canadá</strong> — ConnexOntario, o el programa provincial donde vives.</li>
+      <li><strong>Australia</strong> — Gambling Help Online, 1800 858 858.</li>
+      <li><strong>UE</strong> — el registro de tu regulador nacional; la mayoría gestiona una lista de exclusión entre operadores.</li>
+    </ul>
+
+    <h2>Edad y jurisdicción</h2>
+    <p>
+      Debes tener la edad legal para apostar donde vives — 18+ en la mayor parte de Europa y Australia,
+      21+ en partes de EE. UU. Acceder a un operador desde una jurisdicción donde no tiene licencia
+      es tu responsabilidad, y puede anular cualquier saldo que tengas con él.
+    </p>
+  </section>
+</BaseLayout>

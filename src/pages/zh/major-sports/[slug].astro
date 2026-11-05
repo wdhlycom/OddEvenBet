@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content'
+import ArticleLayout from '@/layouts/ArticleLayout.astro'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('major-sports', ({ data }) => !data.draft && data.lang === 'zh')
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const d = entry.data
+const path = `/zh/major-sports/${entry.id}`
+
+const related = (await getCollection('major-sports', ({ data, id }) =>
+  d.related.includes(id) && !data.draft && data.lang === 'zh',
+))
+
+const schema = [
+  {
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description,
+    dateModified: d.updated.toISOString(),
+    author: { '@type': 'Person', name: d.author },
+    publisher: { '@id': 'https://oddevenbet.com/#org' },
+    mainEntityOfPage: `https://oddevenbet.com${path}`,
+    inLanguage: 'zh-CN',
+  },
+]
+---
+
+<ArticleLayout
+  title={d.title}
+  heading={d.title}
+  description={d.description}
+  path={path}
+  section="主流体育"
+  sectionHref="/zh/major-sports"
+  updated={d.updated}
+  author={d.author}
+  schema={schema}
+>
+  <Content />
+
+  {related.length > 0 && (
+    <div style="margin-top:2.5em;">
+      <h2>继续阅读</h2>
+      <ul>
+        {related.map((r) => (
+          <li><a href={`/zh/major-sports/${r.id}`}>{r.data.title}</a></li>
+        ))}
+      </ul>
+    </div>
+  )}
+</ArticleLayout>

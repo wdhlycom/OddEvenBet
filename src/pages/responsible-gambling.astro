@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="Responsible gambling"
+  description="Risk warnings, self-exclusion tools, deposit limits and helplines for the UK, US, Canada, Australia and the EU. Betting is not a way to make money."
+  path="/responsible-gambling"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Safety</span>
+      <h1>Responsible gambling</h1>
+    </div>
+  </section>
+
+  <TrustNav current="responsible-gambling" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout callout--warn">
+      <strong>The uncomfortable arithmetic</strong>
+      Across regulated sportsbooks, the majority of retail accounts lose money over a year.
+      In prediction markets the same holds: most participants are net negative after fees.
+      Any content that implies otherwise — including ours, if we ever slip — should be treated as marketing.
+    </div>
+
+    <h2>Warning signs</h2>
+    <ul>
+      <li>Betting to recover a previous loss rather than on a view you hold.</li>
+      <li>Chasing a market after settlement has already moved against you.</li>
+      <li>Hiding stakes or losses from people close to you.</li>
+      <li>Staking money set aside for rent, food or debt repayment.</li>
+    </ul>
+
+    <h2>Tools that actually work</h2>
+    <ul>
+      <li><strong>Deposit limits</strong> — set them before your first deposit, when you are still thinking clearly.</li>
+      <li><strong>Time-out periods</strong> — 24 hours to 6 weeks, enforced by the operator, not by willpower.</li>
+      <li><strong>Self-exclusion</strong> — national schemes below remove you from multiple operators at once.</li>
+    </ul>
+
+    <h2>Where to get help</h2>
+    <ul>
+      <li><strong>UK</strong> — GamCare (gamcare.org.uk), GAMSTOP for self-exclusion.</li>
+      <li><strong>US</strong> — 1-800-GAMBLER, or your state's self-exclusion register.</li>
+      <li><strong>Canada</strong> — ConnexOntario, or the provincial programme where you live.</li>
+      <li><strong>Australia</strong> — Gambling Help Online, 1800 858 858.</li>
+      <li><strong>EU</strong> — your national regulator's register; most run a cross-operator exclusion list.</li>
+    </ul>
+
+    <h2>Age and jurisdiction</h2>
+    <p>
+      You must be of legal gambling age where you live — 18+ in most of Europe and Australia,
+      21+ in parts of the US. Accessing an operator from a jurisdiction where it is not licensed
+      is your responsibility, and can void any balance you hold with them.
+    </p>
+  </section>
+</BaseLayout>

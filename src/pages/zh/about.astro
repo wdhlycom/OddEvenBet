@@ -1,0 +1,50 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="关于我们"
+  description="谁在写这个网站、我们覆盖什么、以及我们对自己的要求。预测市场和持牌体育博彩的独立研究。"
+  path="/zh/about"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">关于</span>
+      <h1>这个网站是做什么的</h1>
+      <p class="lede">
+        {site.name} 只想把一个问题答好：在你真正想做的事面前，哪个平台最不坑人——以及你为了搞清楚这件事，要付出什么代价？
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="about" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>我们覆盖什么</h2>
+    <ul>
+      <li><strong>预测市场</strong>——价格就是可能性的那种事件合约。</li>
+      <li><strong>持牌体育博彩</strong>——英国、欧盟、美国、加拿大、拉美的持牌运营方。</li>
+    </ul>
+    <p>
+      我们刻意不碰无牌照的平台、「保本返利」的套路，以及任何说不出自己监管机构是谁的产品。
+    </p>
+
+    <h2>我们怎么做</h2>
+    <p>
+      每一页都有署名作者和一个「更新日期」。评分遵循一份<a href="/zh/methodology">公开的评分标准</a>。凡是没法核实的地方——比如提款时间、牌照号码、低概率下的手续费——页面会直接写明「无法核实」，而不是猜一个数填上去。
+    </p>
+
+    <h2>谁在写</h2>
+    <p>
+      这个网站由 {site.name} 的研究团队编辑。我们和任何被评测的运营方都没有关系。商业关系会在每一篇带有它的页面上披露，并在<a href="/zh/disclosure">利益披露页</a>完整列出。
+    </p>
+
+    <h2>纠错和联系</h2>
+    <p>
+      错误会被修正，并注明修正日期。如果这里有什么地方错了，告诉我们——改对一张手续费表，比一句夸奖对我们更有用。
+    </p>
+  </section>
+</BaseLayout>

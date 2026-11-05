@@ -1,0 +1,66 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { site, scoreDimensions } from '@/data/site'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="评测方法：我们怎么给平台打分"
+  description="我们的完整评分标准、数据来源、哪些是我们自己核实的、哪些核实不了。全部公开，让读者可以自己重新算一遍站上任何一个分数。"
+  path="/zh/methodology"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">信任</span>
+      <h1>评测方法</h1>
+      <p class="lede">
+        发布于 {new Date().getFullYear()} 年。这一页是 {site.name} 每一个分数背后的「合同」。如果一个评分无法追溯到这一页的某个条目，请把它当成错误。
+      </p>
+    </div>
+  </section>
+
+  <TrustNav current="methodology" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <h2>我们打什么分，各占多少权重</h2>
+    <p>
+      六个维度，加权计算。权重是固定的、公开的，所以改一个分数必须改一条具体的证据，而不是改一个「感觉」。
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">维度</th><th scope="col">权重</th><th scope="col">什么会影响它</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>手续费与出金结构</td><td>20%</td><td>公开的手续费表、10% / 50% / 90% 概率下的价差表现、提款成本</td></tr>
+          <tr><td>市场深度与流动性</td><td>20%</td><td>中间价 2 分钱以内的订单簿深度、500 美元订单的滑点</td></tr>
+          <tr><td>易用性</td><td>20%</td><td>开户步骤、市场发现、移动端表现、结算规则的清晰度</td></tr>
+          <tr><td>牌照与资金安全</td><td>20%</td><td>能否点名监管机构、客户资金是否隔离、公司主体是否可追溯</td></tr>
+          <tr><td>出金速度与方式</td><td>10%</td><td>有据可查的时间、可用的渠道、投诉量</td></tr>
+          <tr><td>客服与争议处理</td><td>10%</td><td>首次响应时间、争议是否走一个能点名的仲裁方</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>数据从哪来</h2>
+    <ul>
+      <li><strong>一手：</strong>平台自己公开的手续费表、条款和监管文件。</li>
+      <li><strong>二手：</strong>每页标注日期当天读取的订单簿。</li>
+      <li><strong>三手：</strong>公开评测平台上的用户投诉模式。我们把这些当成「值得去查」的信号，从不单独当作证据。</li>
+    </ul>
+
+    <h2>我们不做什么</h2>
+    <ul>
+      <li>我们不收钱、不收免费额度、不收「评测费」来换一个分数或一个榜单名次。</li>
+      <li>我们不发一篇没有至少一条缺点的评测。</li>
+      <li>我们不假装在一个只读过资料的平台上「交易过」。哪一页是纯研究，那一页会写明。</li>
+    </ul>
+
+    <h2>纠错</h2>
+    <p>
+      如果手续费、牌照或出金条款变了，页面会更新，「更新日期」也会跟着变。实质性修正会在正文里注明，而不是偷偷改掉。要报错，用页脚的链接联系我们。
+    </p>
+  </section>
+</BaseLayout>

@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const entries = (await getCollection('prediction-markets', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const byKind = (k: string) => entries
+  .filter((e) => e.data.kind === k)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[] = [
+  { key: 'explainer', title: 'Understand first: the basics', items: byKind('explainer') },
+  { key: 'guide', title: 'Guides', items: byKind('guide') },
+  { key: 'review', title: 'Platform reviews', items: byKind('review') },
+  { key: 'compare', title: 'Comparisons', items: byKind('compare') },
+  { key: 'best', title: 'Best lists', items: byKind('best') },
+].filter((g) => g.items.length)
+---
+
+<BaseLayout
+  title="Prediction markets: reviews, comparisons and guides"
+  description="Hands-on reviews, side-by-side comparisons and plain-English guides on prediction markets like Polymarket and Kalshi — real events with checkable results."
+  path="/prediction-markets"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Prediction Markets</span>
+      <h1>Bet on real events, not on the house</h1>
+      <p class="lede">
+        Prediction markets let you trade on elections, macro data and world events against
+        other people — with a price that reads as a probability. We review the platforms,
+        explain the mechanics, and name the parts that are genuinely risky.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {groups.map((g) => (
+      <div style="margin-top:32px;">
+        <h2>{g.title}</h2>
+        <div class="grid">
+          {g.items.map((e) => (
+            <article class="card card-link">
+              <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/prediction-markets/${e.id}`}>{e.data.title}</a></h3>
+              <p>{e.data.kind === 'review' ? e.data.verdict : e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+</BaseLayout>

@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const entries = (await getCollection('major-sports', ({ data }) => !data.draft && data.lang === 'zh'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+---
+
+<BaseLayout
+  title="主流体育博彩：足球、NFL、NBA、MLB（中文）"
+  description="主流体育博彩的中文指南——足球、NFL、NBA、MLB 的下注基础，中文原创内容。"
+  path="/zh/major-sports"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">主流体育</span>
+      <h1>盘口最深的市场</h1>
+      <p class="lede">
+        足球、NFL、NBA、MLB 是博彩的主战场。盘口深、信息全，但你的对手也最专业。这里按中文读者的习惯原创撰写。
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {entries.length > 0 ? (
+      <div class="grid">
+        {entries.map((e) => (
+          <article class="card card-link">
+            <span class="meta">{e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+            <h3><a href={`/zh/major-sports/${e.id}`}>{e.data.title}</a></h3>
+            <p>{e.data.summary}</p>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p class="muted">中文内容正在逐步撰写中，敬请期待。</p>
+    )}
+  </section>
+</BaseLayout>

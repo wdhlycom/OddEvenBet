@@ -1,0 +1,40 @@
+---
+import { site, trustNav, locales } from '@/data/site'
+const year = new Date().getFullYear()
+
+// Detect the active language prefix so footer links stay in the current language.
+const path = Astro.url.pathname
+const activeLocale =
+  locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
+  locales[0]
+const prefix = activeLocale.prefix
+---
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div style="max-width: 42ch;">
+        <strong style="color:#f4f1ea;">{site.name}</strong>
+        <p style="margin: 8px 0 0;">{site.description}</p>
+      </div>
+      <div>
+        <strong style="color:#f4f1ea;">{prefix === '/zh' ? '信任' : 'Trust'}</strong>
+        <div class="foot-links">
+          {trustNav.map((item) => (
+            <a href={prefix + item.href}>{prefix === '/zh' ? item.labelZh : item.label}</a>
+          ))}
+          {prefix === '/zh' && <a href="/zh/glossary">术语表</a>}
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-legal">
+      <p style="margin: 0 0 10px;">
+        {site.disclosureShort} Gambling involves risk — only stake what you can afford to lose.
+        18+ / 21+ where required. If gambling is affecting your life, see our{' '}
+        <a href={prefix + '/responsible-gambling'}>responsible gambling resources</a>.
+      </p>
+      <p style="margin: 0; text-align: center;">&copy; {year} {site.name}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

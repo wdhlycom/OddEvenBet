@@ -1,0 +1,168 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { site } from '@/data/site'
+import { ranked } from '@/data/platforms'
+
+const topicCollections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
+
+const reviews = (await Promise.all(
+  topicCollections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review' && data.lang === 'zh')),
+))
+  .flat()
+  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+  .slice(0, 3)
+
+const learn = (await getCollection('learn', ({ data }) => !data.draft && data.lang === 'zh'))
+  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+  .slice(0, 4)
+
+const top = ranked().slice(0, 3)
+
+const reviewPathFor = (e: { id: string; collection: string }) =>
+  `/zh/${e.collection}/${e.id}`
+
+const schema = [
+  {
+    '@type': 'CollectionPage',
+    name: `${site.name} 中文站`,
+    description: site.description,
+    url: `${site.domain}/zh`,
+  },
+]
+---
+
+<BaseLayout
+  title={`${site.name} 中文站 — ${site.tagline}`}
+  description="OddEvenBet 中文站：只做预测市场、体育、赛马这类有真实结果、可查证的事件盘，不碰纯随机可操纵的赌场游戏。公开评分方法，也公开谁付我们钱。"
+  path="/zh"
+  lang="zh"
+  schema={schema}
+>
+  <!-- ============ 报头 ============ -->
+  <section class="masthead">
+    <div class="masthead-main">
+      <span class="kicker">独立研究 · 2026 年第 1 期</span>
+        <h1 class="display-title">只看证据，不看谁给了钱。</h1>
+        <p class="standfirst">
+          预测市场与体育博彩，按一套<strong>公开的评分标准</strong>来评、来排。
+          每一笔费用都标明，每一条结论都可查证，每一个排名都连着背后的评测。
+        </p>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <a class="cta" href="/zh/prediction-markets">看评测</a>
+          <a class="cta cta--ghost" href="/zh/learn">先搞懂机制</a>
+        </div>
+      </div>
+  </section>
+
+  <!-- ============ 色块章节：我们不一样的地方 ============ -->
+  <section class="colour-field colour-field--orange">
+    <div class="wrap" style="padding-block:56px;">
+      <span class="kicker" style="color:#141412;">我们不一样的地方</span>
+      <h2 style="margin-top:0; max-width:18ch;">真实事件、可查结果、没有隐藏条款</h2>
+      <div class="grid" style="margin-top:32px;">
+        <article class="card">
+          <span class="meta">一</span>
+          <h3><a href="/zh/methodology" style="color:inherit; text-decoration:none;">别人没有的「结果可查证」评分</a></h3>
+          <p>
+            每个平台、每个盘，我们都打一个「结果能不能独立查证」的分——依据官方数据、
+            裁判记录、法院文书、具名监管机构。这一栏你在大型比价网站上看不到。
+            <a href="/zh/methodology" style="color:inherit; text-decoration:underline;">看我们怎么打分</a>。
+          </p>
+        </article>
+        <article class="card">
+          <span class="meta">二</span>
+          <h3><a href="/zh/learn" style="color:inherit; text-decoration:none;">教你验证，而不是只让你点链接</a></h3>
+          <p>
+            多数网站只告诉你「哪个平台最好」。我们还会教你自己判断：一个盘是不是真的、
+            结算规则怎么定、那个牌照是真有还是页脚贴的假 Logo。
+            <a href="/zh/learn" style="color:inherit; text-decoration:underline;">从头学起</a>。
+          </p>
+        </article>
+        <article class="card">
+          <span class="meta">三</span>
+          <h3>披露做到极致</h3>
+          <p>
+            每篇文章都写明有没有联盟链接。榜单按公开的评分规则排，花钱也改不了排名。
+            我们连「拒绝过哪些合作」都列出来。
+            <a href="/zh/disclosure" style="color:inherit; text-decoration:underline;">看完整披露</a>。
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 榜单 ============ -->
+  <section class="wrap" style="padding-block:64px 24px;">
+    <span class="eyebrow">榜单 · 每月更新</span>
+    <h2 style="margin-top:0;">当前评分最高的平台</h2>
+    <p class="muted" style="max-width:44ch;">
+      按我们<a href="/zh/methodology">评分方法</a>里的加权分排序，费用与流动性权重最高。
+    </p>
+    <div class="grid" style="margin-top:28px;">
+      {top.map((p, i) => {
+        const review = reviews.find((r) => r.data.platformSlug === p.slug)
+        return (
+          <PlatformCard
+            platform={p}
+            rank={i + 1}
+            reviewSlug={review ? reviewPathFor(review) : undefined}
+            lang="zh"
+          />
+        )
+      })}
+    </div>
+  </section>
+
+  <!-- ============ 色块章节：最新评测（鼠尾草绿） ============ -->
+  <section class="colour-field colour-field--sage">
+    <div class="wrap" style="padding-block:64px;">
+      <span class="kicker" style="color:#141412;">最新评测</span>
+      <h2 style="margin-top:0;">从编辑部新鲜出炉</h2>
+      <div class="grid" style="margin-top:28px;">
+        {reviews.length ? reviews.map((r) => (
+          <article class="card">
+            <span class="meta">评测 · {r.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+            <h3><a href={reviewPathFor(r)}>{r.data.title}</a></h3>
+            <p>{r.data.description}</p>
+          </article>
+        )) : (
+          <p class="muted" style="margin:0;">评测内容正在撰写中。</p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 先读再入金 ============ -->
+  <section class="wrap" style="padding-block:64px 24px;">
+    <span class="eyebrow">入金前先读</span>
+    <h2 style="margin-top:0;">先搞懂机制，再决定要不要入金</h2>
+    <p class="muted" style="max-width:44ch;">
+      这个品类里大多数亏损，来自没搞懂结算、费用和流动性是怎么运作的。
+    </p>
+    <div class="grid" style="margin-top:28px;">
+      {learn.map((l) => (
+        <article class="card">
+          <span class="meta">{l.data.topic}</span>
+          <h3><a href={`/zh/learn/${l.id}`}>{l.data.question}</a></h3>
+          <p>{l.data.answer}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- ============ 色块章节：立场（黑） ============ -->
+  <section class="colour-field colour-field--black">
+    <div class="wrap" style="padding-block:64px;">
+      <span class="kicker" style="color:var(--acid);">我们的立场</span>
+      <h2 style="margin-top:0; max-width:20ch;">
+        我们不是荐彩号，是一个你能重复做的核查。
+      </h2>
+      <p style="max-width:48ch; color:#b3aea4; font-size:1.05rem;">
+        一条结论查证不了，我们就直说，并写明「没能核实」的部分。这正是这份刊物的全部意义。
+      </p>
+      <a class="cta" href="/zh/methodology" style="background:var(--acid); color:#141412;">读我们的评分方法</a>
+    </div>
+  </section>
+</BaseLayout>

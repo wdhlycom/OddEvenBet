@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TrustNav from '@/components/TrustNav.astro'
+---
+
+<BaseLayout
+  title="负责任博彩"
+  description="风险提示、自我排除工具、存款限额，以及英国、美国、加拿大、澳大利亚、欧盟的求助热线。博彩不是赚钱的方式。"
+  path="/zh/responsible-gambling"
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">安全</span>
+      <h1>负责任博彩</h1>
+    </div>
+  </section>
+
+  <TrustNav current="responsible-gambling" />
+
+  <section class="wrap measure" style="padding-block:48px 64px;">
+    <div class="callout callout--warn">
+      <strong>一句不中听的算术</strong>
+      在受监管的体育博彩里，大多数散户账户一年下来是亏钱的。预测市场也一样：大多数参与者扣掉手续费后是净亏损。任何暗示相反的言论——包括我们自己的，如果我们哪天不小心说漏了——都应该被当成营销话术。
+    </div>
+
+    <h2>预警信号</h2>
+    <ul>
+      <li>为了追回上一笔亏损而下注，而不是因为你真的看好一个结果。</li>
+      <li>结算已经对你不利了，还在追加。</li>
+      <li>对身边的人隐瞒下注金额或亏损。</li>
+      <li>拿本来要付房租、买饭、还债的钱去下注。</li>
+    </ul>
+
+    <h2>真正有用的工具</h2>
+    <ul>
+      <li><strong>存款限额</strong>——在第一次存款之前就设好，趁你脑子还清醒的时候。</li>
+      <li><strong>冷静期</strong>——24 小时到 6 周，由运营方强制执行，不是靠你的意志力。</li>
+      <li><strong>自我排除</strong>——下面这些全国性计划，能让你一次从多家运营方里退出。</li>
+    </ul>
+
+    <h2>去哪里求助</h2>
+    <ul>
+      <li><strong>英国</strong>——GamCare（gamcare.org.uk），GAMSTOP 用于自我排除。</li>
+      <li><strong>美国</strong>——1-800-GAMBLER，或你所在州的自我排除登记。</li>
+      <li><strong>加拿大</strong>——ConnexOntario，或你所在省份的计划。</li>
+      <li><strong>澳大利亚</strong>——Gambling Help Online，1800 858 858。</li>
+      <li><strong>欧盟</strong>——你所在国家监管机构的登记；大多数都有跨运营方的排除名单。</li>
+    </ul>
+
+    <h2>年龄和司法辖区</h2>
+    <p>
+      你必须达到你居住地的法定博彩年龄——欧洲大部分地区和澳大利亚是 18 岁以上，美国部分地区是 21 岁以上。从一个它没有牌照的地方访问运营方，是你自己的责任，而且可能导致你在他那里的余额被作废。
+    </p>
+  </section>
+</BaseLayout>

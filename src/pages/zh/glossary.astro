@@ -1,0 +1,438 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// 术语按运动分组。每个词条：term=词名, en=英文/别名, def=2-3句详解, bet=对下注意味着什么。
+// 词条末尾的 to 是可选的站内运动页链接。
+
+interface Term {
+  term: string
+  en?: string
+  def: string
+  bet: string
+  to?: string
+}
+
+interface Group {
+  sport: string
+  href?: string
+  intro: string
+  terms: Term[]
+}
+
+// 词条首字 → 拼音首字母（用于顶部字母索引）。只覆盖本页出现的词，避免引入完整拼音库。
+const pinyinInitial: Record<string, string> = {
+  独: 'D', 让: 'R', 总: 'Z', 滚: 'G', 亚: 'Y', 背: 'B', 轮: 'L', 七: 'Q',
+  点: 'D', 守: 'S', 空: 'K', 先: 'X', 回: 'H', 获: 'H', 缠: 'C', 减: 'J',
+  地: 'D', 场: 'C', 最: 'Z', 单: 'D',
+}
+
+// 取词条的索引键：中文取拼音首字母，英文/数字取首字符。
+function termKey(t: Term): string {
+  const head = t.term.trim()[0]
+  if (!head) return '#'
+  if (/[a-zA-Z]/.test(head)) return head.toUpperCase()
+  if (/[0-9]/.test(head)) return '#'
+  return pinyinInitial[head] ?? head
+}
+
+const groups: Group[] = [
+  {
+    sport: '通用盘口',
+    intro: '不分运动、任何下注都可能碰到的词。先把这层看懂，再看各运动的专属词。',
+    terms: [
+      {
+        term: '独赢 / moneyline',
+        en: 'moneyline',
+        def: '最基础的一种下注：只押谁赢，不看赢多少。弱队赢球的赔率会很高，因为难。',
+        bet: '对新手来说这是最好上手的盘，先从这里练判断，再碰让分和大小分。',
+        to: '/zh/learn/zh-san-da-pankou',
+      },
+      {
+        term: '让分 / 点差',
+        en: 'point spread',
+        def: '给强队减分、弱队加分后再比谁赢，把强弱悬殊的比赛拉成五五开。比如「主队 -7.5」表示主队要净胜 8 分才算赢。',
+        bet: '让分盘的陷阱在于：你押的不是「谁赢」，是「赢多少」。强队常胜但不常「赢够分」。',
+        to: '/zh/learn/zh-san-da-pankou',
+      },
+      {
+        term: '总分 / 大小分',
+        en: 'over/under',
+        def: '押两队总得分比一个设定数字大还是小，不押谁赢，只押「一共进多少」。',
+        bet: '大小分适合你不确定谁赢、但能判断比赛节奏快慢的时候。',
+        to: '/zh/learn/zh-san-da-pankou',
+      },
+      {
+        term: '滚球 / 实时盘',
+        en: 'live betting',
+        def: '比赛开打后仍可下注，盘口跟着比分实时变动。',
+        bet: '实时盘波动快，最容易让新手被情绪带着追单。先练熟赛前盘再碰它。',
+        to: '/zh/learn/zh-gunqiu-shishenme',
+      },
+    ],
+  },
+  {
+    sport: '足球',
+    href: '/zh/major-sports/zh-zuqiu-xinshou-rumen',
+    intro: '全球博彩体量最大的项目，术语也最多。',
+    terms: [
+      {
+        term: '亚洲盘 / 让球',
+        en: 'asian handicap',
+        def: '给强队一个「负担」让比赛变五五开。整数盘（让 1 球）可能走水退款，带 0.5 的盘（让 0.5 球）不会走水，必分胜负。',
+        bet: '带 0.5 的盘不会有「打平退钱」的情况，比整数盘更干脆，新手容易理解。',
+      },
+      {
+        term: '1X2',
+        def: '足球最基本的三种结果：1 = 主胜，X = 平局，2 = 客胜。',
+        bet: '这是「三选一」，比让球盘的「二选一」难一点，但赔率结构更直白。',
+      },
+    ],
+  },
+  {
+    sport: '篮球（NBA）',
+    href: '/zh/major-sports/zh-nba-rumen',
+    intro: '场次最密、变量最多的主流联赛，术语集中在盘口和赛程。',
+    terms: [
+      {
+        term: '背靠背',
+        en: 'back-to-back',
+        def: '同一支球队连续两天各打一场比赛。第二场球员体力没恢复，状态明显下滑。',
+        bet: '背靠背第二场的强队，冷门率比平时高，别把它当成和平时一样稳。',
+      },
+      {
+        term: '轮休 / 负荷管理',
+        en: 'load management',
+        def: '球队故意让主力这一场不上场，省体力去打后面更重要的比赛。',
+        bet: '下单前必查主力轮不轮休——一个主力缺阵就能改变整个盘口。',
+      },
+      {
+        term: '七战四胜',
+        en: 'best-of-seven',
+        def: '季后赛系列赛的赛制，两支球队先赢 4 场者晋级。',
+        bet: '系列赛场次多，冷门比单场定胜负少，强队更难被爆冷淘汰。',
+      },
+    ],
+  },
+  {
+    sport: '美式足球（NFL）',
+    href: '/zh/major-sports/zh-nfl-rumen',
+    intro: '一周一场、节奏最慢的主流联赛，伤病和点差是核心。',
+    terms: [
+      {
+        term: '点差',
+        en: 'spread',
+        def: '美式足球的让分盘，和篮球的让分同理，给强队减分后再比输赢。',
+        bet: 'NFL 点差通常是 3 分左右，比赛分差小，胜负常在一球之间。',
+      },
+    ],
+  },
+  {
+    sport: '冰球（NHL）',
+    href: '/zh/major-sports/zh-bingqiu-nhl-rumen',
+    intro: '进球少、节奏快，让分盘和守门员是关键。',
+    terms: [
+      {
+        term: 'puck line',
+        def: '冰球的让分盘，几乎固定让 1.5 球。因为冰球进球少，1.5 球已是很大的差距。',
+        bet: 'puck line 固定 1.5，等于每次都在赌「赢球还得多进一球」，比独赢难。',
+      },
+      {
+        term: '守门员',
+        en: 'goalie',
+        def: '冰球最关键的位置，状态热起来能单场扑 40 次射门，直接决定比赛走向。',
+        bet: '下单前先看双方首发守门员是谁——他的状态比球队近期战绩更能决定结果。',
+      },
+      {
+        term: '空门进球',
+        en: 'empty net goal',
+        def: '落后方最后撤下守门员多上一名进攻球员，此时对手打进空门。',
+        bet: '空门进球常发生在最后两分钟，1 分领先瞬间变 2 分，影响大小分盘的结算。',
+      },
+    ],
+  },
+  {
+    sport: '棒球（MLB）',
+    href: '/zh/major-sports/zh-mlb-rumen',
+    intro: '赛程最长的联赛，先发投手决定大半场比赛。',
+    terms: [
+      {
+        term: '先发投手',
+        en: 'starting pitcher',
+        def: '一场比赛开场的投手，要投大半场，他的状态直接决定比赛走向。',
+        bet: 'MLB 下单前必看双方先发投手是谁——这比球队战绩更能预测结果。',
+      },
+      {
+        term: 'run line',
+        def: '棒球的让分盘，通常让 1.5 分。因为棒球比分普遍低，1.5 分已是不小差距。',
+        bet: 'run line 固定 1.5，等于赌「赢球且分差够大」，比独赢赔率高但更难。',
+      },
+    ],
+  },
+  {
+    sport: '格斗（UFC / MMA）',
+    href: '/zh/niche-sports/zh-ufc-mma-rumen',
+    intro: '信息量最大、最依赖选手风格的盘口。',
+    terms: [
+      {
+        term: '回合盘',
+        en: 'rounds / over-under rounds',
+        def: '押比赛会不会打满某个回合，依赖选手「速战还是磨满全场」的风格。',
+        bet: '回合盘的关键是判断两个选手的风格克制，而不是名气。',
+      },
+      {
+        term: '获胜方式',
+        en: 'method of victory',
+        def: 'KO/TKO、降服、判定三选一，MMA 独有的、信息量最大的盘。',
+        bet: '获胜方式盘回报最高，但要求你对双方技术特点有真判断，新手先看胜负盘。',
+      },
+      {
+        term: '缠斗型 / 站立型',
+        en: 'grappler / striker',
+        def: 'MMA 最基础的风格判断：靠地面降服 vs 靠拳腿 KO。',
+        bet: '风格克制比名气重要——一个缠斗高手遇到防摔强的站立选手，可能完全发挥不出来。',
+      },
+      {
+        term: '减重 / 称重',
+        en: 'weight cut / weigh-in',
+        def: '赛前一天称重达标。减重失败会明显乏力，直接毁掉技术分析。',
+        bet: '下单前查称重结果——减重异常的选手，状态往往崩得比技术差距更厉害。',
+      },
+    ],
+  },
+  {
+    sport: '电竞',
+    href: '/zh/niche-sports/zh-dianjing-xiashu-zhinan',
+    intro: '年轻市场，术语集中在赛制和地图。',
+    terms: [
+      {
+        term: '地图胜负',
+        en: 'map winner',
+        def: '押单张地图的胜负，变数比整场比赛大得多。',
+        bet: '单张地图的冷门率远高于整场，新手从整场胜负盘入手更稳。',
+      },
+      {
+        term: 'Major',
+        def: 'CS2 的顶级官方赛事，反假赛机制成熟。',
+        bet: 'Major 级别的赛事信息透明度高，比低级别赛事更适合新手下注。',
+      },
+    ],
+  },
+  {
+    sport: '板球',
+    href: '/zh/niche-sports/zh-banqiu-rumen',
+    intro: '亚洲市场巨大，赛制和场地是关键变量。',
+    terms: [
+      {
+        term: 'T20 / ODI / 测试赛',
+        en: 'T20 / ODI / Test',
+        def: '板球的三种赛制：T20 约 3 小时、ODI 约 8 小时、测试赛长达 5 天，节奏和冷门率完全不同。',
+        bet: 'T20 节奏快、冷门多，测试赛节奏慢、强队更稳——先搞清你在看哪种赛制。',
+      },
+      {
+        term: 'IPL',
+        def: '印度超级联赛，全球最值钱的板球联赛，也是博彩最活跃的市场之一。',
+        bet: 'IPL 赛季期间市场深度最好、盘口最多，是练手板球的好时机。',
+      },
+      {
+        term: 'toss（掷硬币）',
+        def: '赛前掷硬币决定谁先攻，某些场地先攻优势巨大。',
+        bet: '掷硬币结果会立刻影响赔率，下单前先等 toss 结果出来。',
+      },
+      {
+        term: 'pitch（场地）',
+        def: '板球场的草皮，硬度湿度不同，决定是打手友好还是投手友好。',
+        bet: '不同场地的 pitch 属性，直接影响大小分盘的走向，下注前要查。',
+      },
+    ],
+  },
+  {
+    sport: '网球',
+    href: '/zh/niche-sports/zh-wangqiu-rumen',
+    intro: '场地类型决定一切。',
+    terms: [
+      {
+        term: '让局 / 让盘',
+        en: 'game/handicap',
+        def: '强手让弱手几局或几盘，押能不能赢过这个让分。',
+        bet: '让局盘的关键是判断强弱差距到底有多大，别只看排名。',
+      },
+      {
+        term: '总局数',
+        en: 'total games',
+        def: '押整场总局数大于还是小于某个数。',
+        bet: '总局数取决于场地——硬地回合多、草地回合少，同一个数在不同场地含义完全不同。',
+      },
+      {
+        term: '场地类型',
+        en: 'surface',
+        def: '硬地、红土、草地球速和回合差异大，同一选手在不同场地表现天差地别。',
+        bet: '下单前必看比赛在什么场地——红土高手到了草地可能被低排名选手爆冷。',
+      },
+    ],
+  },
+  {
+    sport: '飞镖',
+    href: '/zh/niche-sports/zh-feibiao-rumen',
+    intro: '节奏快、冷门多的小众市场。',
+    terms: [
+      {
+        term: '总 180',
+        en: 'total 180s',
+        def: '押全场打出几个「180 分」（单轮最高分）。',
+        bet: '这类盘更接近彩蛋，趣味性强，别下重注。',
+      },
+      {
+        term: '最高收尾',
+        en: 'highest checkout',
+        def: '押谁打出的收尾分最高。',
+        bet: '好玩但随机性强，当作娱乐盘而非研究盘。',
+      },
+    ],
+  },
+  {
+    sport: '斯诺克',
+    href: '/zh/niche-sports/zh-sinuoke-rumen',
+    intro: '适合做功课的人，变量集中在单杆数据。',
+    terms: [
+      {
+        term: '单杆最高',
+        en: 'highest break',
+        def: '押全场谁打出单杆最高分。',
+        bet: '这个盘依赖选手近期的单杆手感，做点功课就能找到价值。',
+      },
+      {
+        term: '总破百',
+        en: 'total centuries',
+        def: '押全场打出几个「破百」（单杆 100 分以上）。',
+        bet: '和单杆最高同理，适合研究型玩家，回报稳定但需要功课。',
+      },
+    ],
+  },
+]
+
+// 术语结构化数据：把每个词条声明为 DefinedTerm，供搜索引擎理解本页是术语表。
+const schema = groups.flatMap((g) =>
+  g.terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    name: t.term.split(' / ')[0],
+    alternateName: t.en,
+    description: `${t.def} ${t.bet}`,
+    inDefinedTermSet: { '@type': 'DefinedTermSet', name: '体育博彩术语表' },
+  })),
+)
+
+// 首字母索引：收集所有词条的 key，按字母排序，每个 key 对应第一个词条的锚点 id。
+const allTerms = groups.flatMap((g) => g.terms.map((t) => ({ key: termKey(t), g, t })))
+const indexMap = new Map<string, string>()
+for (const { key, g, t } of allTerms) {
+  if (!indexMap.has(key)) {
+    const i = g.terms.indexOf(t)
+    indexMap.set(key, `term-${key}-${i}`)
+  }
+}
+const indexKeys = [...indexMap.keys()].sort((a, b) => {
+  if (a === '#') return -1
+  if (b === '#') return 1
+  return a.localeCompare(b)
+})
+---
+
+<BaseLayout
+  title="体育博彩术语表（Glossary）"
+  description="按运动分组的体育博彩术语详解：盘口、赛制、专有名词，每个词都讲清是什么、对下注意味着什么，新手查词一站解决。"
+  path="/zh/glossary"
+  lang="zh"
+  schema={schema}
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Glossary</span>
+      <h1>体育博彩术语表</h1>
+      <p class="lede">
+        按运动分组整理盘口、赛制、专有名词。每个词都讲清「是什么」和「对下注意味着什么」，
+        新手看到不认识的词，来这一页查就行。最基础的盘口概念，先看<a href="/zh/learn/zh-san-da-pankou">三大基础盘口</a>。
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    <nav style="margin-bottom:32px;">
+      <p class="muted small" style="margin:0 0 8px;">按首字母查词：</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+        {indexKeys.map((k) => (
+          <a class="chip chip--idx" href={`#${indexMap.get(k)}`} style="text-decoration:none;">{k}</a>
+        ))}
+      </div>
+      <p class="muted small" style="margin:0 0 8px;">按运动跳到：</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {groups.map((g) => (
+          <a class="chip" href={`#${g.sport}`} style="text-decoration:none;">{g.sport}</a>
+        ))}
+      </div>
+    </nav>
+
+    {groups.map((g) => (
+      <div id={g.sport} style="margin-top:40px;scroll-margin-top:80px;">
+        <h2 style="text-transform:none;">
+          {g.href ? <a href={g.href} style="text-decoration:none;color:inherit;">{g.sport}</a> : g.sport}
+        </h2>
+        <p class="muted">{g.intro}</p>
+        <dl class="glossary">
+          {g.terms.map((t, i) => (
+            <div class="glossary-item" id={`term-${termKey(t)}-${i}`} style="scroll-margin-top:80px;">
+              <dt>
+                {t.term}
+                {t.en && <span class="term-en">{t.en}</span>}
+                {(t.to || g.href) && (
+                  <a class="term-link" href={t.to ?? g.href}>
+                    {t.to ? '详解 →' : `去 ${g.sport} 页 →`}
+                  </a>
+                )}
+              </dt>
+              <dd>
+                <p>{t.def}</p>
+                <p class="term-bet"><strong>对下注意味着什么：</strong>{t.bet}</p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .glossary { margin: 0; }
+  .glossary-item {
+    padding: 16px 0;
+    border-top: 1px solid var(--border, #333);
+  }
+  .glossary-item:last-child { border-bottom: 1px solid var(--border, #333); }
+  .glossary-item dt {
+    font-weight: 700;
+    font-size: 1.05em;
+  }
+  .term-en {
+    font-weight: 400;
+    color: var(--muted, #888);
+    margin-left: 8px;
+    font-size: 0.9em;
+  }
+  .glossary-item dd { margin: 8px 0 0; }
+  .glossary-item dd p { margin: 0 0 6px; }
+  .term-bet { color: var(--muted, #999); font-size: 0.95em; }
+  .term-link { font-weight: 400; font-size: 0.85em; margin-left: 8px; }
+  .chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--border, #333);
+    border-radius: 999px;
+    font-size: 0.9em;
+  }
+  .chip--idx {
+    min-width: 32px;
+    text-align: center;
+    padding: 4px 8px;
+    font-weight: 600;
+  }
+</style>

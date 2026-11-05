@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { bySlug } from '@/data/platforms'
+
+const collections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
+const all = await Promise.all(
+  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review')),
+)
+const entries = all
+  .flat()
+  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+
+const hrefFor = (e: { id: string; collection: string }) =>
+  `/${e.collection}/${e.id}`
+
+const groups = [
+  { type: 'prediction-market' as const, label: 'Prediction markets' },
+  { type: 'sportsbook' as const, label: 'Sportsbooks' },
+]
+---
+
+<BaseLayout
+  title="Reviews: prediction markets and sportsbooks"
+  description="Full reviews of prediction markets and licensed sportsbooks. Each one lists fees, payout terms, licensing and the parts we could not verify — plus who should stay away."
+  path="/reviews"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Reviews</span>
+      <h1>Every review, with the downside stated</h1>
+      <p class="lede">
+        A review that lists no drawbacks is an advertisement. We score against a fixed rubric
+        and publish the score breakdown so you can disagree with it specifically.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {groups.map((g) => {
+      const items = entries.filter((e) => bySlug(e.data.platformSlug)?.type === g.type)
+      if (!items.length) return null
+      return (
+        <div style="margin-top:40px;">
+          <h2>{g.label}</h2>
+          <div class="grid">
+            {items.map((e) => (
+              <article class="card card-link">
+                <span class="meta">Updated {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
+                <p>{e.data.verdict}</p>
+                <div class="small muted" style="font-size:.82rem;">
+                  <div><strong>Best for:</strong> {e.data.bestFor}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )
+    })}
+
+    {entries.length === 0 && (
+      <p class="muted">No reviews published yet.</p>
+    )}
+  </section>
+</BaseLayout>
