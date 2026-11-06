@@ -5,7 +5,7 @@ import { bySlug } from '@/data/platforms'
 
 const collections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
 const all = await Promise.all(
-  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review')),
+  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review' && (data.lang ?? 'en') === 'en')),
 )
 const entries = all
   .flat()

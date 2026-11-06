@@ -14,7 +14,7 @@ const reviews = (await Promise.all(
   .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
   .slice(0, 3)
 
-const learn = (await getCollection('learn', ({ data }) => !data.draft && data.lang === 'zh'))
+const learn = (await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'zh'))
   .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
   .slice(0, 4)
 
@@ -51,7 +51,7 @@ const schema = [
         </p>
         <div style="display:flex; gap:14px; flex-wrap:wrap;">
           <a class="cta" href="/zh/prediction-markets">看评测</a>
-          <a class="cta cta--ghost" href="/zh/learn">先搞懂机制</a>
+          <a class="cta cta--ghost" href="/zh/essentials">先搞懂机制</a>
         </div>
       </div>
   </section>
@@ -73,11 +73,11 @@ const schema = [
         </article>
         <article class="card">
           <span class="meta">二</span>
-          <h3><a href="/zh/learn" style="color:inherit; text-decoration:none;">教你验证，而不是只让你点链接</a></h3>
+          <h3><a href="/zh/essentials" style="color:inherit; text-decoration:none;">教你验证，而不是只让你点链接</a></h3>
           <p>
             多数网站只告诉你「哪个平台最好」。我们还会教你自己判断：一个盘是不是真的、
             结算规则怎么定、那个牌照是真有还是页脚贴的假 Logo。
-            <a href="/zh/learn" style="color:inherit; text-decoration:underline;">从头学起</a>。
+            <a href="/zh/essentials" style="color:inherit; text-decoration:underline;">从头学起</a>。
           </p>
         </article>
         <article class="card">
@@ -145,7 +145,7 @@ const schema = [
       {learn.map((l) => (
         <article class="card">
           <span class="meta">{l.data.topic}</span>
-          <h3><a href={`/zh/learn/${l.id}`}>{l.data.question}</a></h3>
+          <h3><a href={`/zh/essentials/${l.id.replace(/^zh\//, '')}`}>{l.data.question}</a></h3>
           <p>{l.data.answer}</p>
         </article>
       ))}

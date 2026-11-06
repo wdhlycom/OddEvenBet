@@ -7,7 +7,7 @@ import { glob } from 'astro/loaders'
  *   prediction-markets  ->  /prediction-markets/...
  *   niche-sports        ->  /niche-sports/...
  *   major-sports        ->  /major-sports/...
- *   learn               ->  /learn/...  (the cross-topic explainer layer)
+ *   essentials          ->  /essentials/...  (the cross-topic explainer layer)
  *
  * Each article carries a `kind` tag that says WHAT form it takes
  * (review / compare / guide / best / explainer). The form is a property of
@@ -123,12 +123,12 @@ const topic = (base: string) =>
   })
 
 /**
- * LEARN — the trust layer. Definitional, question-first pages.
+ * ESSENTIALS — the trust layer. Definitional, question-first pages.
  * Target: "what is X", "how does X work", "is X legal".
  * No affiliate CTA in the body. This layer exists to earn rankings, not clicks.
  */
-const learn = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/learn' }),
+const essentials = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/essentials' }),
   schema: z.object({
     title: z.string(),
     description: z.string().min(30).max(170),
@@ -155,5 +155,5 @@ export const collections = {
   'prediction-markets': topic('prediction-markets'),
   'niche-sports': topic('niche-sports'),
   'major-sports': topic('major-sports'),
-  learn,
+  essentials,
 }

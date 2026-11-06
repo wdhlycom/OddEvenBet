@@ -44,7 +44,7 @@ const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[]
           {g.items.map((e) => (
             <article class="card card-link">
               <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
-              <h3><a href={`/zh/prediction-markets/${e.id}`}>{e.data.title}</a></h3>
+              <h3><a href={`/zh/prediction-markets/${e.id.replace(/^zh\//, '')}`}>{e.data.title}</a></h3>
               <p>{e.data.summary}</p>
             </article>
           ))}

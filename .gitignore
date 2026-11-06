@@ -26,3 +26,14 @@ pnpm-debug.log*
 
 # workbuddy project data
 .workbuddy/
+
+# local debug / audit scratch files
+_backup/
+_checkdist.mjs
+_checklinks.mjs
+_dev.log
+_langaudit.json
+_langaudit.mjs
+_pairs.mjs
+_pairs.txt
+*.bak_*

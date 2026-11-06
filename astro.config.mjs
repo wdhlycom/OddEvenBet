@@ -20,10 +20,22 @@ export default defineConfig({
     // /learn/what-is-a-prediction-market.html — cleaner URLs on any host.
     format: 'directory',
   },
+  // Dev toolbar off. It injects a separate client bundle plus several web
+  // components into every page during `astro dev`, and on this machine it was
+  // the main reason scrolling and clicking felt like they took seconds.
+  // Nothing in production is affected — the toolbar only exists in dev.
+  devToolbar: { enabled: false },
   vite: {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+    server: {
+      watch: {
+        // Don't watch build output or archived copies. Watching dist/ means
+        // every `npm run build` triggers a cascade of HMR invalidations.
+        ignored: ['**/dist/**', '**/_backup/**', '**/.astro/**'],
       },
     },
   },

@@ -1,5 +1,6 @@
 ---
 import { site, nav, locales } from '@/data/site'
+import { sibling, allRoutes } from '@/data/routes'
 import Search from './Search.astro'
 
 const path = Astro.url.pathname
@@ -10,17 +11,31 @@ const activeLocale =
   locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
   locales[0]
 
-// Path without the language prefix. On a locale root (e.g. "/zh") this is "",
-// so sibling links build as "/zh" rather than "/zh/" (trailingSlash: never).
-const basePath = activeLocale.prefix ? path.slice(activeLocale.prefix.length) : (path === '/' ? '' : path)
-
-// Build a sibling URL for another locale. An empty basePath means "home".
-const siblingHref = (prefix: string) => {
-  const target = prefix + basePath
-  return target === '' ? '/' : target
-}
+// Sibling links are resolved against the set of URLs this build actually emits,
+// so a language switch can never land on a 404. Chinese articles for the topic
+// collections use `zh-` slugs while English ones don't, which is why a plain
+// prefix swap used to break; `sibling()` handles that and falls back to the
+// section index rather than producing a dead link.
+const options = await Promise.all(
+  locales.map(async (l) => ({
+    code: l.code,
+    label: l.label,
+    href: (await sibling(path, l.prefix)).href,
+  })),
+)
 
 const homeHref = activeLocale.prefix || '/'
+
+// Only render nav entries that exist in the active language. Spanish currently
+// has no /es/prediction-markets or /es/glossary, and a nav link to a 404 is
+// worse than a shorter menu.
+const routes = await allRoutes()
+const navItems = nav
+  .map((item) => ({
+    href: activeLocale.prefix + item.href,
+    label: activeLocale.code === 'zh' ? item.labelZh : item.label,
+  }))
+  .filter((item) => routes.has(item.href))
 ---
 
 <header class="site-head">
@@ -28,23 +43,15 @@ const homeHref = activeLocale.prefix || '/'
     <a class="brand" href={homeHref}>{site.name}<span>.</span></a>
 
     <nav class="site-nav" aria-label="Primary">
-      {nav.map((item) => (
+      {navItems.map((item) => (
         <a
-          href={activeLocale.prefix + item.href}
-          aria-current={path.startsWith(activeLocale.prefix + item.href) ? 'page' : undefined}
+          href={item.href}
+          aria-current={path.startsWith(item.href) ? 'page' : undefined}
         >
-          {activeLocale.code === 'zh' ? item.labelZh : item.label}
+          {item.label}
         </a>
       ))}
-      {activeLocale.code === 'zh' && (
-        <a
-          href="/zh/glossary"
-          aria-current={path.startsWith('/zh/glossary') ? 'page' : undefined}
-        >
-          术语表
-        </a>
-      )}
-    </nav>
+      </nav>
 
     <div class="head-controls">
       <Search lang={activeLocale.code} />
@@ -61,8 +68,8 @@ const homeHref = activeLocale.prefix || '/'
 
       <label class="lang-switch" aria-label="Language">
         <select id="lang-select">
-          {locales.map((l) => (
-            <option value={siblingHref(l.prefix)} selected={l.code === activeLocale.code}>
+          {options.map((l) => (
+            <option value={l.href} selected={l.code === activeLocale.code}>
               {l.label}
             </option>
           ))}

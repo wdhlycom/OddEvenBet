@@ -1,5 +1,6 @@
 ---
 import { site, trustNav, locales } from '@/data/site'
+import { allRoutes } from '@/data/routes'
 const year = new Date().getFullYear()
 
 // Detect the active language prefix so footer links stay in the current language.
@@ -8,6 +9,18 @@ const activeLocale =
   locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
   locales[0]
 const prefix = activeLocale.prefix
+
+// Spanish has no glossary or responsible-gambling page yet; filter those out
+// rather than shipping links that 404.
+const routes = await allRoutes()
+const exists = (href: string) => routes.has(href)
+const trustLinks = trustNav
+  .map((item) => ({
+    href: prefix + item.href,
+    label: prefix === '/zh' ? item.labelZh : item.label,
+  }))
+  .filter((item) => exists(item.href))
+const glossaryHref = prefix + '/glossary'
 ---
 
 <footer class="site-foot">
@@ -20,10 +33,12 @@ const prefix = activeLocale.prefix
       <div>
         <strong style="color:#f4f1ea;">{prefix === '/zh' ? '信任' : 'Trust'}</strong>
         <div class="foot-links">
-          {trustNav.map((item) => (
-            <a href={prefix + item.href}>{prefix === '/zh' ? item.labelZh : item.label}</a>
+          {trustLinks.map((item) => (
+            <a href={item.href}>{item.label}</a>
           ))}
-          {prefix === '/zh' && <a href="/zh/glossary">术语表</a>}
+          {exists(glossaryHref) && (
+            <a href={glossaryHref}>{prefix === '/zh' ? '术语表' : 'Glossary'}</a>
+          )}
         </div>
       </div>
     </div>

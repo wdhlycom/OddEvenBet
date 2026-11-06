@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'es')
+  const topics = [...new Set(entries.map((e) => e.data.topic))]
+  return topics.map((topic) => ({ params: { topic }, props: { topic } }))
+}
+
+const { topic } = Astro.props
+
+const topicMeta: Record<string, { label: string; blurb: string }> = {
+  'getting-started': { label: 'Para empezar', blurb: 'Qué es este sitio y cómo usarlo.' },
+  'betting-basics': { label: 'Conceptos básicos', blurb: 'Cuotas, precios y contratos, en palabras llanas.' },
+  'betting-strategy': { label: 'Estrategia', blurb: 'Por qué pierde la mayoría y cómo evitar las trampas.' },
+  'mindset': { label: 'Riesgo y mentalidad', blurb: 'Cómo pensar el riesgo y gestionar un bankroll.' },
+}
+const meta = topicMeta[topic] ?? { label: topic, blurb: '' }
+
+const items = (await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'es' && data.topic === topic))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^es\//, '')
+---
+
+<BaseLayout
+  title={`${meta.label} — Aprende`}
+  description={meta.blurb}
+  path={`/es/essentials/topic/${topic}`}
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow"><a href="/es/essentials" style="text-decoration:none;color:inherit;">Aprende</a></span>
+      <h1>{meta.label}</h1>
+      <p class="lede">{meta.blurb}</p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-block:40px 64px;">
+    <div class="grid">
+      {items.map((e) => (
+        <article class="card card-link">
+          <h3><a href={`/es/essentials/${slugOf(e)}`}>{e.data.question}</a></h3>
+          <p>{e.data.answer}</p>
+          <span class="meta">{e.data.updated.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

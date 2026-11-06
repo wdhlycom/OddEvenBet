@@ -45,34 +45,34 @@ const groups: Group[] = [
         en: 'moneyline',
         def: '最基础的一种下注：只押谁赢，不看赢多少。弱队赢球的赔率会很高，因为难。',
         bet: '对新手来说这是最好上手的盘，先从这里练判断，再碰让分和大小分。',
-        to: '/zh/learn/zh-san-da-pankou',
+        to: '/zh/essentials/san-da-pan-kou',
       },
       {
         term: '让分 / 点差',
         en: 'point spread',
         def: '给强队减分、弱队加分后再比谁赢，把强弱悬殊的比赛拉成五五开。比如「主队 -7.5」表示主队要净胜 8 分才算赢。',
         bet: '让分盘的陷阱在于：你押的不是「谁赢」，是「赢多少」。强队常胜但不常「赢够分」。',
-        to: '/zh/learn/zh-san-da-pankou',
+        to: '/zh/essentials/san-da-pan-kou',
       },
       {
         term: '总分 / 大小分',
         en: 'over/under',
         def: '押两队总得分比一个设定数字大还是小，不押谁赢，只押「一共进多少」。',
         bet: '大小分适合你不确定谁赢、但能判断比赛节奏快慢的时候。',
-        to: '/zh/learn/zh-san-da-pankou',
+        to: '/zh/essentials/san-da-pan-kou',
       },
       {
         term: '滚球 / 实时盘',
         en: 'live betting',
         def: '比赛开打后仍可下注，盘口跟着比分实时变动。',
         bet: '实时盘波动快，最容易让新手被情绪带着追单。先练熟赛前盘再碰它。',
-        to: '/zh/learn/zh-gunqiu-shishenme',
+        to: '/zh/essentials/gun-qiu-shi-shen-me',
       },
     ],
   },
   {
     sport: '足球',
-    href: '/zh/major-sports/zh-zuqiu-xinshou-rumen',
+    href: '/zh/major-sports/zu-qiu-xin-shou-ru-men',
     intro: '全球博彩体量最大的项目，术语也最多。',
     terms: [
       {
@@ -90,7 +90,7 @@ const groups: Group[] = [
   },
   {
     sport: '篮球（NBA）',
-    href: '/zh/major-sports/zh-nba-rumen',
+    href: '/zh/major-sports/nba-ru-men',
     intro: '场次最密、变量最多的主流联赛，术语集中在盘口和赛程。',
     terms: [
       {
@@ -115,7 +115,7 @@ const groups: Group[] = [
   },
   {
     sport: '美式足球（NFL）',
-    href: '/zh/major-sports/zh-nfl-rumen',
+    href: '/zh/major-sports/nfl-ru-men',
     intro: '一周一场、节奏最慢的主流联赛，伤病和点差是核心。',
     terms: [
       {
@@ -128,7 +128,7 @@ const groups: Group[] = [
   },
   {
     sport: '冰球（NHL）',
-    href: '/zh/major-sports/zh-bingqiu-nhl-rumen',
+    href: '/zh/major-sports/bing-qiu-nhl-ru-men',
     intro: '进球少、节奏快，让分盘和守门员是关键。',
     terms: [
       {
@@ -152,7 +152,7 @@ const groups: Group[] = [
   },
   {
     sport: '棒球（MLB）',
-    href: '/zh/major-sports/zh-mlb-rumen',
+    href: '/zh/major-sports/mlb-ru-men',
     intro: '赛程最长的联赛，先发投手决定大半场比赛。',
     terms: [
       {
@@ -170,7 +170,7 @@ const groups: Group[] = [
   },
   {
     sport: '格斗（UFC / MMA）',
-    href: '/zh/niche-sports/zh-ufc-mma-rumen',
+    href: '/zh/niche-sports/ufc-mma-ru-men',
     intro: '信息量最大、最依赖选手风格的盘口。',
     terms: [
       {
@@ -201,7 +201,7 @@ const groups: Group[] = [
   },
   {
     sport: '电竞',
-    href: '/zh/niche-sports/zh-dianjing-xiashu-zhinan',
+    href: '/zh/niche-sports/dian-jing-xia-shu-zhi-nan',
     intro: '年轻市场，术语集中在赛制和地图。',
     terms: [
       {
@@ -219,7 +219,7 @@ const groups: Group[] = [
   },
   {
     sport: '板球',
-    href: '/zh/niche-sports/zh-banqiu-rumen',
+    href: '/zh/niche-sports/ban-qiu-ru-men',
     intro: '亚洲市场巨大，赛制和场地是关键变量。',
     terms: [
       {
@@ -247,7 +247,7 @@ const groups: Group[] = [
   },
   {
     sport: '网球',
-    href: '/zh/niche-sports/zh-wangqiu-rumen',
+    href: '/zh/niche-sports/wang-qiu-ru-men',
     intro: '场地类型决定一切。',
     terms: [
       {
@@ -272,7 +272,7 @@ const groups: Group[] = [
   },
   {
     sport: '飞镖',
-    href: '/zh/niche-sports/zh-feibiao-rumen',
+    href: '/zh/niche-sports/fei-biao-ru-men',
     intro: '节奏快、冷门多的小众市场。',
     terms: [
       {
@@ -291,7 +291,7 @@ const groups: Group[] = [
   },
   {
     sport: '斯诺克',
-    href: '/zh/niche-sports/zh-sinuoke-rumen',
+    href: '/zh/niche-sports/si-nuo-ke-ru-men',
     intro: '适合做功课的人，变量集中在单杆数据。',
     terms: [
       {
@@ -350,7 +350,7 @@ const indexKeys = [...indexMap.keys()].sort((a, b) => {
       <h1>体育博彩术语表</h1>
       <p class="lede">
         按运动分组整理盘口、赛制、专有名词。每个词都讲清「是什么」和「对下注意味着什么」，
-        新手看到不认识的词，来这一页查就行。最基础的盘口概念，先看<a href="/zh/learn/zh-san-da-pankou">三大基础盘口</a>。
+        新手看到不认识的词，来这一页查就行。最基础的盘口概念，先看<a href="/zh/essentials/san-da-pan-kou">三大基础盘口</a>。
       </p>
     </div>
   </section>

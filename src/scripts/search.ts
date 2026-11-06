@@ -80,9 +80,9 @@ export async function search(query: string, lang: Lang, limit = 8): Promise<Sear
       // NOTE: res.results items are { id, data() } — the url/title/excerpt only
       // exist AFTER awaiting data(). Filter by url AFTER loading the data.
       const data = await r.data()
-      // Pagefind returns URLs with a trailing slash (e.g. "/zh/learn/"), but the
+      // Pagefind returns URLs with a trailing slash (e.g. "/zh/essentials/"), but the
       // site is built with `trailingSlash: 'never'` so the real pages live at
-      // "/zh/learn". Strip the trailing slash (except the bare "/" root) so links
+      // "/zh/essentials". Strip the trailing slash (except the bare "/" root) so links
       // don't 404.
       let url = (data?.url as string) || ''
       if (url.length > 1 && url.endsWith('/')) url = url.slice(0, -1)

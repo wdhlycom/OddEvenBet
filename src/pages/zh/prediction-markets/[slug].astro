@@ -10,13 +10,16 @@ import { bySlug, ranked, localized } from '@/data/platforms'
 
 export async function getStaticPaths() {
   const entries = await getCollection('prediction-markets', ({ data }) => !data.draft && data.lang === 'zh')
-  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^zh\//, '') },
+    props: { entry },
+  }))
 }
 
 const { entry } = Astro.props
 const { Content } = await render(entry)
 const d = entry.data
-const path = `/zh/prediction-markets/${entry.id}`
+const path = `/zh/prediction-markets/${entry.id.replace(/^zh\//, '')}`
 const section = '预测市场'
 const sectionHref = '/zh/prediction-markets'
 
@@ -220,7 +223,7 @@ if (d.kind === 'guide') {
           <h2>继续阅读</h2>
           <ul>
             {related.map((r) => (
-              <li><a href={`/zh/prediction-markets/${r.id}`}>{r.data.title}</a></li>
+              <li><a href={`/zh/prediction-markets/${r.id.replace(/^zh\//, '')}`}>{r.data.title}</a></li>
             ))}
           </ul>
         </div>

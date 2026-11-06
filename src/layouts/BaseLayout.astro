@@ -2,12 +2,13 @@
 import Header from '@/components/Header.astro'
 import Footer from '@/components/Footer.astro'
 import { site, locales } from '@/data/site'
+import { sibling } from '@/data/routes'
 import '@/styles/global.css'
 
 interface Props {
   title: string
   description: string
-  /** Path only, e.g. "/learn/what-is-x". Canonical is derived from site.domain. */
+  /** Path only, e.g. "/essentials/what-is-x". Canonical is derived from site.domain. */
   path: string
   /** Optional language code. Defaults to "en" (no prefix). */
   lang?: 'en' | 'zh' | 'es'
@@ -20,8 +21,14 @@ const { title, description, path, lang = 'en', schema = [], noindex = false } = 
 const canonical = new URL(path, site.domain).href
 const pageTitle = path === '/' ? title : `${title} — ${site.name}`
 
-// Strip any language prefix to build sibling URLs for hreflang alternates.
-const pathNoLang = path.replace(/^\/(zh|es)(?=\/|$)/, '') || '/'
+/**
+ * hreflang alternates. Only emitted for genuine translations of this page —
+ * a fallback (e.g. the section index) would tell Google two different pages are
+ * the same article, which is worse than omitting the tag.
+ */
+const alternates = (await Promise.all(
+  locales.map(async (l) => ({ code: l.code, ...(await sibling(path, l.prefix)) })),
+)).filter((a) => a.exact)
 
 const siteGraph = [
   {
@@ -62,18 +69,21 @@ const siteGraph = [
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Latin webfonts only. CJK is served from the system stack (PingFang SC /
+      Microsoft YaHei / SimSun) — pulling Noto Sans SC + Noto Serif SC from
+      Google Fonts added ~570 KB of render-blocking CSS and 500+ @font-face
+      rules, which stalled first paint and caused reflow storms on Chinese
+      pages. System CJK fonts render instantly and cost nothing.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=General+Sans:wght@600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=General+Sans:wght@600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap"
       rel="stylesheet"
     />
     {noindex && <meta name="robots" content="noindex, follow" />}
 
-    {locales.map((l) => (
-      <link
-        rel="alternate"
-        hreflang={l.code}
-        href={new URL(l.prefix + pathNoLang, site.domain).href}
-      />
+    {alternates.map((l) => (
+      <link rel="alternate" hreflang={l.code} href={new URL(l.href, site.domain).href} />
     ))}
 
     <meta property="og:type" content="website" />

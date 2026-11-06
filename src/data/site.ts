@@ -28,12 +28,13 @@ export const locales = [
 export type LocaleCode = (typeof locales)[number]['code']
 
 export const nav = [
-  { label: 'Learn', labelZh: '学习', href: '/learn' },
+  { label: 'Essentials', labelZh: '必备', href: '/essentials' },
   { label: 'Prediction Markets', labelZh: '预测市场', href: '/prediction-markets' },
   { label: 'Niche Sports', labelZh: '冷门运动', href: '/niche-sports' },
   { label: 'Major Sports', labelZh: '热门运动', href: '/major-sports' },
   { label: 'Reviews', labelZh: '评测', href: '/reviews' },
   { label: 'About', labelZh: '关于', href: '/about' },
+  { label: 'Glossary', labelZh: '术语表', href: '/glossary' },
 ] as const
 
 export const trustNav = [

@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content'
+import ArticleLayout from '@/layouts/ArticleLayout.astro'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'zh')
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^zh\//, '') },
+    props: { entry },
+  }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const d = entry.data
+const path = `/zh/essentials/${entry.id.replace(/^zh\//, '')}`
+
+const schema = [
+  {
+    '@type': 'Article',
+    headline: d.question,
+    description: d.description,
+    dateModified: d.updated.toISOString(),
+    author: { '@type': 'Person', name: d.author },
+    publisher: { '@id': 'https://oddevenbet.com/#org' },
+    mainEntityOfPage: `https://oddevenbet.com${path}`,
+    inLanguage: 'zh-CN',
+  },
+]
+---
+
+<ArticleLayout
+  title={d.title}
+  heading={d.question}
+  description={d.description}
+  path={path}
+  section="必备"
+  sectionHref="/zh/essentials"
+  updated={d.updated}
+  author={d.author}
+  schema={schema}
+>
+  <div class="callout">
+    <strong>一句话回答</strong>
+    {d.answer}
+  </div>
+
+  <Content />
+</ArticleLayout>

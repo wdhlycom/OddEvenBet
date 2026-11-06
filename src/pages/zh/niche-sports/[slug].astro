@@ -4,13 +4,16 @@ import ArticleLayout from '@/layouts/ArticleLayout.astro'
 
 export async function getStaticPaths() {
   const entries = await getCollection('niche-sports', ({ data }) => !data.draft && data.lang === 'zh')
-  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^zh\//, '') },
+    props: { entry },
+  }))
 }
 
 const { entry } = Astro.props
 const { Content } = await render(entry)
 const d = entry.data
-const path = `/zh/niche-sports/${entry.id}`
+const path = `/zh/niche-sports/${entry.id.replace(/^zh\//, '')}`
 
 const related = (await getCollection('niche-sports', ({ data, id }) =>
   d.related.includes(id) && !data.draft && data.lang === 'zh',
@@ -48,7 +51,7 @@ const schema = [
       <h2>继续阅读</h2>
       <ul>
         {related.map((r) => (
-          <li><a href={`/zh/niche-sports/${r.id}`}>{r.data.title}</a></li>
+          <li><a href={`/zh/niche-sports/${r.id.replace(/^zh\//, '')}`}>{r.data.title}</a></li>
         ))}
       </ul>
     </div>

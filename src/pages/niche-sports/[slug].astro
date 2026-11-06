@@ -9,7 +9,7 @@ import FAQ from '@/components/FAQ.astro'
 import { bySlug, ranked } from '@/data/platforms'
 
 export async function getStaticPaths() {
-  const entries = await getCollection('niche-sports', ({ data }) => !data.draft)
+  const entries = await getCollection('niche-sports', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en')
   return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
 }
 
@@ -30,7 +30,7 @@ let winner: 'left' | 'right' = 'left'
 let linked: ReturnType<typeof bySlug>[] = []
 
 const related = (await getCollection('niche-sports', ({ data, id }) =>
-  d.related.includes(id) && !data.draft,
+  d.related.includes(id) && !data.draft && (data.lang ?? 'en') === 'en',
 ))
 
 if (d.kind === 'review') {

@@ -8,8 +8,8 @@
    General Sans (display, grotesk-tight) + Literata (serif text)
    loaded via <link> in BaseLayout head. */
 :root {
-  --font-display: "General Sans", "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-text: "Literata", "Noto Serif SC", Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+  --font-display: "General Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-text: "Literata", Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
 
   /* report-blocks palette */
   --paper: #ffffff;
@@ -63,15 +63,15 @@ a:hover { text-decoration-style: solid; }
 /* ---- editorial type scale ---- */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.98;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
   margin: 0 0 0.5em;
   color: var(--ink);
 }
-h1 { font-size: clamp(2.4rem, 7vw, 5.2rem); }
-h2 { font-size: clamp(1.8rem, 4vw, 3rem); margin-top: 1.6em; }
-h3 { font-size: 1.25rem; margin-top: 1.2em; line-height: 1.1; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.9rem); }
+h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); margin-top: 1.6em; }
+h3 { font-size: 1.12rem; margin-top: 1.2em; line-height: 1.2; }
 
 p, ul, ol, blockquote { margin: 0 0 1.15em; }
 ul, ol { padding-left: 1.3em; }
@@ -207,12 +207,12 @@ hr::after {
 }
 .display-title {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.6rem, 8vw, 6.2rem);
-  line-height: 0.94;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   margin: 0 0 0.4em;
-  max-width: 12ch;
+  max-width: 18ch;
 }
 .standfirst {
   font-family: var(--font-text);
@@ -231,8 +231,8 @@ hr::after {
   padding: clamp(40px, 6vw, 80px) 0;
 }
 .page-masthead h1 {
-  font-size: clamp(2.4rem, 6vw, 4.6rem);
-  max-width: 16ch;
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  max-width: 22ch;
   margin: 0 0 0.35em;
 }
 .lede {

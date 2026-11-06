@@ -8,13 +8,13 @@ import { ranked } from '@/data/platforms'
 const topicCollections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
 
 const reviews = (await Promise.all(
-  topicCollections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review')),
+  topicCollections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review' && (data.lang ?? 'en') === 'en')),
 ))
   .flat()
   .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
   .slice(0, 3)
 
-const learn = (await getCollection('learn', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
+const learn = (await getCollection('essentials', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
   .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
   .slice(0, 4)
 
@@ -51,7 +51,7 @@ const schema = [
         </p>
         <div style="display:flex; gap:14px; flex-wrap:wrap;">
           <a class="cta" href="/prediction-markets">See the reviews</a>
-          <a class="cta cta--ghost" href="/learn">Start with the basics</a>
+          <a class="cta cta--ghost" href="/essentials">Start with the basics</a>
         </div>
       </div>
   </section>
@@ -143,7 +143,7 @@ const schema = [
       {learn.map((l) => (
         <article class="card">
           <span class="meta">{l.data.topic}</span>
-          <h3><a href={`/learn/${l.id}`}>{l.data.question}</a></h3>
+          <h3><a href={`/essentials/${l.id}`}>{l.data.question}</a></h3>
           <p>{l.data.answer}</p>
         </article>
       ))}

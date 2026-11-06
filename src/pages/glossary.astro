@@ -1,0 +1,418 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Terms grouped by sport. Each entry: term=name, en=alias, def=2-3 sentence
+// explanation, bet=what it means for your bet. The optional `to` links to the
+// in-depth article for that topic.
+
+interface Term {
+  term: string
+  en?: string
+  def: string
+  bet: string
+  to?: string
+}
+
+interface Group {
+  sport: string
+  href?: string
+  intro: string
+  terms: Term[]
+}
+
+// Index key: first character of the term. Letters uppercase, digits grouped as '#'.
+function termKey(t: Term): string {
+  const head = t.term.trim()[0]
+  if (!head) return '#'
+  if (/[a-zA-Z]/.test(head)) return head.toUpperCase()
+  return '#'
+}
+
+const groups: Group[] = [
+  {
+    sport: 'General markets',
+    intro:
+      'Markets you can hit in any sport. Read these first, then the sport-specific terms.',
+    terms: [
+      {
+        term: 'Moneyline',
+        en: 'win bet',
+        def: 'The simplest bet: pick who wins, not by how much. Underdogs pay more because they are harder to call.',
+        bet: 'The easiest first market. Practise here before you touch spreads and totals.',
+        to: '/essentials/three-core-betting-markets',
+      },
+      {
+        term: 'Point spread',
+        en: 'spread',
+        def: 'Give the favourite points or the underdog points, then bet on who covers. "Home -7.5" means the home side must win by 8.',
+        bet: 'The trap is you are not betting who wins, but by how much. Favourites often win without covering.',
+        to: '/essentials/three-core-betting-markets',
+      },
+      {
+        term: 'Over/under',
+        en: 'totals',
+        def: 'Bet whether the two teams\u2019 combined score beats a set number, not who wins.',
+        bet: 'Good when you can read the pace but not the winner.',
+        to: '/essentials/three-core-betting-markets',
+      },
+      {
+        term: 'Live betting',
+        en: 'in-play',
+        def: 'Betting after the game starts; the odds move with the score.',
+        bet: 'Fast-moving and easy to chase. Learn pre-game markets first.',
+        to: '/essentials/what-is-live-betting',
+      },
+    ],
+  },
+  {
+    sport: 'Soccer',
+    href: '/major-sports/soccer-betting-guide',
+    intro: 'The biggest betting market in the world, and the most terms.',
+    terms: [
+      {
+        term: 'Asian handicap',
+        def: 'Give the favourite a handicap to make the game even. Whole-number lines can push (refund); .5 lines always settle.',
+        bet: 'The .5 lines never push and are easier for beginners.',
+      },
+      {
+        term: '1X2',
+        def: 'The three basic soccer outcomes: 1 = home win, X = draw, 2 = away win.',
+        bet: 'A three-way bet with a simpler odds structure than a handicap.',
+      },
+    ],
+  },
+  {
+    sport: 'Basketball (NBA)',
+    href: '/major-sports/nba-betting-guide',
+    intro: 'The densest schedule and most variables; terms cluster around lines and rest.',
+    terms: [
+      {
+        term: 'Back-to-back',
+        def: 'A team playing on consecutive nights; the second game is played on tired legs.',
+        bet: 'Favourites on the second night of a back-to-back get upset more often than usual.',
+      },
+      {
+        term: 'Load management',
+        en: 'rest',
+        def: 'Teams deliberately rest starters on some nights to save them for bigger games.',
+        bet: 'Always check who is resting \u2014 one missing star changes the whole line.',
+      },
+      {
+        term: 'Best-of-seven',
+        def: 'The playoff series format; the first team to four wins advances.',
+        bet: 'Series play means fewer upsets than single elimination.',
+      },
+    ],
+  },
+  {
+    sport: 'American football (NFL)',
+    href: '/major-sports/nfl-betting-guide',
+    intro: 'One game a week and a slower pace; injuries and the spread are the core.',
+    terms: [
+      {
+        term: 'Spread',
+        en: 'point spread',
+        def: 'The NFL handicap, same idea as basketball: give the favourite points and bet on covering.',
+        bet: 'NFL spreads often sit around 3 points; games are decided by a single score.',
+      },
+    ],
+  },
+  {
+    sport: 'Ice hockey (NHL)',
+    href: '/major-sports/nhl-betting-guide',
+    intro: 'Few goals and a fast pace; the goalie and the puck line are key.',
+    terms: [
+      {
+        term: 'Puck line',
+        def: 'Hockey\u2019s handicap, almost always 1.5 goals. Because goals are scarce, 1.5 is a big margin.',
+        bet: 'A fixed 1.5 means you always need to win by two \u2014 harder than the moneyline.',
+      },
+      {
+        term: 'Goalie',
+        en: 'goaltender',
+        def: 'Hockey\u2019s most important position; a hot goalie can stop 40 shots a night.',
+        bet: 'Check both starting goalies before you bet \u2014 their form matters more than the team record.',
+      },
+      {
+        term: 'Empty-net goal',
+        def: 'A trailing team pulls its goalie late; the opponent scores into the empty net.',
+        bet: 'Happens in the final minutes and can swing a one-goal lead into two, changing totals.',
+      },
+    ],
+  },
+  {
+    sport: 'Baseball (MLB)',
+    href: '/major-sports/mlb-betting-guide',
+    intro: 'The longest season; the starting pitcher decides most of the game.',
+    terms: [
+      {
+        term: 'Starting pitcher',
+        def: 'The pitcher who opens the game and throws most innings; his form decides the game.',
+        bet: 'Always check both starters \u2014 they predict the result better than team record.',
+      },
+      {
+        term: 'Run line',
+        def: 'Baseball\u2019s handicap, usually 1.5 runs. Low scores make 1.5 a real margin.',
+        bet: 'A fixed 1.5 means win by two \u2014 higher odds than the moneyline but harder.',
+      },
+    ],
+  },
+  {
+    sport: 'Fighting (UFC / MMA)',
+    href: '/niche-sports/mma-betting-guide',
+    intro: 'The most information-heavy board; style matchups decide everything.',
+    terms: [
+      {
+        term: 'Rounds',
+        en: 'over/under rounds',
+        def: 'Bet whether a fight reaches a certain round; depends on pace versus grinding style.',
+        bet: 'The key is the style matchup, not the fighter\u2019s popularity.',
+      },
+      {
+        term: 'Method of victory',
+        def: 'KO/TKO, submission or decision \u2014 MMA\u2019s own, most information-heavy market.',
+        bet: 'Pays best but needs real technical reads; start with the moneyline.',
+      },
+      {
+        term: 'Grappler / striker',
+        def: 'The basic style split: ground submissions versus striking KOs.',
+        bet: 'Style beats name \u2014 a grappler facing a strong takedown defender can be neutralised.',
+      },
+      {
+        term: 'Weight cut',
+        en: 'weigh-in',
+        def: 'Making weight the day before; a failed cut drains energy and ruins your read.',
+        bet: 'Check the weigh-in \u2014 a bad cut breaks a fighter faster than a skill gap.',
+      },
+    ],
+  },
+  {
+    sport: 'Esports',
+    href: '/niche-sports/esports-betting-guide',
+    intro: 'A young market; terms cluster around series and maps.',
+    terms: [
+      {
+        term: 'Map winner',
+        def: 'A bet on a single map, far more volatile than the match.',
+        bet: 'Map upsets outnumber match upsets; start with the full match.',
+      },
+      {
+        term: 'Major',
+        def: 'CS2\u2019s top official event, with mature anti-match-fixing controls.',
+        bet: 'Top-tier events are transparent and safer for beginners than minor leagues.',
+      },
+    ],
+  },
+  {
+    sport: 'Cricket',
+    href: '/niche-sports/cricket-betting-guide',
+    intro: 'A huge Asian market; format and conditions are the key variables.',
+    terms: [
+      {
+        term: 'T20 / ODI / Test',
+        def: 'The three formats: T20 runs about 3 hours, ODI about 8, a Test up to 5 days; pace and upset rates differ.',
+        bet: 'T20 is fast and volatile, Tests are slow and favour the strong \u2014 know which format you are watching.',
+      },
+      {
+        term: 'IPL',
+        def: 'The Indian Premier League, the world\u2019s most valuable cricket league and a very active betting market.',
+        bet: 'The deepest markets of the season; a good time to learn cricket.',
+      },
+      {
+        term: 'Toss',
+        def: 'The pre-match coin flip deciding who bats first; a big edge on some grounds.',
+        bet: 'The toss moves odds instantly \u2014 wait for it before you bet.',
+      },
+      {
+        term: 'Pitch',
+        def: 'The ground\u2019s surface; hardness and moisture decide whether it favours bat or ball.',
+        bet: 'Pitch characteristics drive the totals \u2014 check them first.',
+      },
+    ],
+  },
+  {
+    sport: 'Tennis',
+    href: '/niche-sports/tennis-betting-guide',
+    intro: 'Surface decides everything.',
+    terms: [
+      {
+        term: 'Game handicap',
+        def: 'The stronger player gives games or sets; bet on covering.',
+        bet: 'Judging the real gap matters more than the ranking.',
+      },
+      {
+        term: 'Total games',
+        def: 'Bet whether the match\u2019s total games goes over or under a number.',
+        bet: 'Depends on surface \u2014 hard courts rally longer, grass shorter.',
+      },
+      {
+        term: 'Surface',
+        def: 'Hard, clay and grass play at very different speeds; a player can transform across surfaces.',
+        bet: 'Always check the surface \u2014 a clay specialist can be upset on grass.',
+      },
+    ],
+  },
+  {
+    sport: 'Darts',
+    href: '/niche-sports/darts-betting-guide',
+    intro: 'A fast, upset-heavy niche market.',
+    terms: [
+      {
+        term: 'Total 180s',
+        def: 'Bet how many maximums (180s) are hit in a match.',
+        bet: 'More of a novelty market \u2014 keep stakes small.',
+      },
+      {
+        term: 'Highest checkout',
+        def: 'Bet who finishes with the highest checkout.',
+        bet: 'Fun but high-variance; a novelty bet, not research.',
+      },
+    ],
+  },
+  {
+    sport: 'Snooker',
+    href: '/niche-sports/snooker-betting-guide',
+    intro: 'Rewards homework; variables cluster around breaks.',
+    terms: [
+      {
+        term: 'Highest break',
+        def: 'Bet who hits the highest single break.',
+        bet: 'Depends on recent break form \u2014 a little work finds value.',
+      },
+      {
+        term: 'Total centuries',
+        def: 'Bet how many century breaks (100+) appear.',
+        bet: 'Like the highest break; rewards research-minded players.',
+      },
+    ],
+  },
+]
+
+// Structured data: declare each entry as a DefinedTerm so search engines
+// understand this page is a glossary.
+const schema = groups.flatMap((g) =>
+  g.terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    name: t.term.split(' / ')[0],
+    alternateName: t.en,
+    description: `${t.def} ${t.bet}`,
+    inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'Sports Betting Glossary' },
+  })),
+)
+
+// Letter index: collect each term's key, sorted, each mapped to its anchor id.
+const allTerms = groups.flatMap((g) => g.terms.map((t) => ({ key: termKey(t), g, t })))
+const indexMap = new Map<string, string>()
+for (const { key, g, t } of allTerms) {
+  if (!indexMap.has(key)) {
+    const i = g.terms.indexOf(t)
+    indexMap.set(key, `term-${key}-${i}`)
+  }
+}
+const indexKeys = [...indexMap.keys()].sort((a, b) => {
+  if (a === '#') return -1
+  if (b === '#') return 1
+  return a.localeCompare(b)
+})
+---
+
+<BaseLayout
+  title="Sports Betting Glossary"
+  description="Sports betting terms explained by sport: markets, formats and jargon, each with what it means and what it means for your bet. Look up any word in one place."
+  path="/glossary"
+  lang="en"
+  schema={schema}
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Glossary</span>
+      <h1>Sports Betting Glossary</h1>
+      <p class="lede">
+        Markets, formats and jargon grouped by sport. Every term explains what it is and what it
+        means for your bet, so you can look up any word you run into. For the core market concepts,
+        start with <a href="/essentials/three-core-betting-markets">the three basic markets</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    <nav style="margin-bottom:32px;">
+      <p class="muted small" style="margin:0 0 8px;">Browse by letter:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+        {indexKeys.map((k) => (
+          <a class="chip chip--idx" href={`#${indexMap.get(k)}`} style="text-decoration:none;">{k}</a>
+        ))}
+      </div>
+      <p class="muted small" style="margin:0 0 8px;">Jump to a sport:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {groups.map((g) => (
+          <a class="chip" href={`#${g.sport}`} style="text-decoration:none;">{g.sport}</a>
+        ))}
+      </div>
+    </nav>
+
+    {groups.map((g) => (
+      <div id={g.sport} style="margin-top:40px;scroll-margin-top:80px;">
+        <h2 style="text-transform:none;">
+          {g.href ? <a href={g.href} style="text-decoration:none;color:inherit;">{g.sport}</a> : g.sport}
+        </h2>
+        <p class="muted">{g.intro}</p>
+        <dl class="glossary">
+          {g.terms.map((t, i) => (
+            <div class="glossary-item" id={`term-${termKey(t)}-${i}`} style="scroll-margin-top:80px;">
+              <dt>
+                {t.term}
+                {t.en && <span class="term-en">{t.en}</span>}
+                {(t.to || g.href) && (
+                  <a class="term-link" href={t.to ?? g.href}>
+                    {t.to ? 'In depth \u2192' : `Go to ${g.sport} \u2192`}
+                  </a>
+                )}
+              </dt>
+              <dd>
+                <p>{t.def}</p>
+                <p class="term-bet"><strong>What it means for your bet: </strong>{t.bet}</p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .glossary { margin: 0; }
+  .glossary-item {
+    padding: 16px 0;
+    border-top: 1px solid var(--border, #333);
+  }
+  .glossary-item:last-child { border-bottom: 1px solid var(--border, #333); }
+  .glossary-item dt {
+    font-weight: 700;
+    font-size: 1.05em;
+  }
+  .term-en {
+    font-weight: 400;
+    color: var(--muted, #888);
+    margin-left: 8px;
+    font-size: 0.9em;
+  }
+  .glossary-item dd { margin: 8px 0 0; }
+  .glossary-item dd p { margin: 0 0 6px; }
+  .term-bet { color: var(--muted, #999); font-size: 0.95em; }
+  .term-link { font-weight: 400; font-size: 0.85em; margin-left: 8px; }
+  .chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--border, #333);
+    border-radius: 999px;
+    font-size: 0.9em;
+  }
+  .chip--idx {
+    min-width: 32px;
+    text-align: center;
+    padding: 4px 8px;
+    font-weight: 600;
+  }
+</style>

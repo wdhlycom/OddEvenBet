@@ -4,19 +4,19 @@ import { site } from '@/data/site'
 import type { APIContext } from 'astro'
 
 export async function GET(context: APIContext) {
-  const [learn, predictionMarkets, nicheSports, majorSports] = await Promise.all([
-    getCollection('learn', ({ data }) => !data.draft),
+  const [essentials, predictionMarkets, nicheSports, majorSports] = await Promise.all([
+    getCollection('essentials', ({ data }) => !data.draft),
     getCollection('prediction-markets', ({ data }) => !data.draft),
     getCollection('niche-sports', ({ data }) => !data.draft),
     getCollection('major-sports', ({ data }) => !data.draft),
   ])
 
   const items = [
-    ...learn.map((e) => ({
+    ...essentials.map((e) => ({
       title: e.data.question,
       description: e.data.description,
       pubDate: e.data.updated,
-      link: `/learn/${e.id}/`,
+      link: `/essentials/${e.id}/`,
     })),
     ...predictionMarkets.map((e) => ({
       title: e.data.title,

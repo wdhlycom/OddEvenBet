@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'zh')
+  const topics = [...new Set(entries.map((e) => e.data.topic))]
+  return topics.map((topic) => ({ params: { topic }, props: { topic } }))
+}
+
+const { topic } = Astro.props
+
+const topicMeta: Record<string, { label: string; blurb: string }> = {
+  'getting-started': { label: '从这里开始', blurb: '这个网站是做什么的、怎么用。' },
+  'betting-basics': { label: '基础知识 · 概念', blurb: '赔率、价格、合约这些名词，用大白话讲清楚。' },
+  'betting-strategy': { label: '基础知识 · 策略', blurb: '为什么大多数人会亏钱，怎么避开那些坑。' },
+  'mindset': { label: '认知与心态', blurb: '我们的招牌。不教你「怎么赢」，教你怎么想。' },
+}
+const meta = topicMeta[topic] ?? { label: topic, blurb: '' }
+
+const items = (await getCollection('essentials', ({ data }) => !data.draft && data.lang === 'zh' && data.topic === topic))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^zh\//, '')
+---
+
+<BaseLayout
+  title={`${meta.label} — 必备`}
+  description={meta.blurb}
+  path={`/zh/essentials/topic/${topic}`}
+  lang="zh"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow"><a href="/zh/essentials" style="text-decoration:none;color:inherit;">必备</a></span>
+      <h1>{meta.label}</h1>
+      <p class="lede">{meta.blurb}</p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-block:40px 64px;">
+    <div class="grid">
+      {items.map((e) => (
+        <article class="card card-link">
+          <h3><a href={`/zh/essentials/${slugOf(e)}`}>{e.data.question}</a></h3>
+          <p>{e.data.answer}</p>
+          <span class="meta">{e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
