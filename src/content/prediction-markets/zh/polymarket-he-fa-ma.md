@@ -1,5 +1,5 @@
 ---
-title: "Polymarket 在美国合法吗？分州说清楚"
+title: "Polymarket 合法吗？答案取决于你住哪"
 description: "Polymarket 的合规身份很特殊：它在美国有一个受监管的实体，但整体以离岸加密原生平台运营。这篇讲清它和 CFTC 的关系、哪些州能用、美国用户和海外用户的区别，以及你需要自己核对的几件事。"
 kind: "guide"
 summary: "Polymarket 的合规身份、CFTC 的和解历史、美国哪些州受限，以及为什么'合法'这件事要分地区、分平台实体来看。"

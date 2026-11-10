@@ -1,5 +1,5 @@
 ---
-title: "UFC / MMA Betting Guide: Moneyline, Rounds and Three Key Variables"
+title: "UFC Betting: Three Variables the Odds Do Not Show"
 description: "UFC is the fastest-growing combat betting sport, with seven-figure handles on main events. MMA's unique markets and the three variables most people get wrong."
 kind: "guide"
 summary: "UFC's market types (moneyline, rounds, method of victory) and three key variables: weight class, grappler vs striker, and camp preparation."

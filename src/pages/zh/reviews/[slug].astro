@@ -1,0 +1,194 @@
+---
+import { getCollection, render } from 'astro:content'
+import ArticleLayout from '@/layouts/ArticleLayout.astro'
+import ScoreCard from '@/components/ScoreCard.astro'
+import AffiliateCTA from '@/components/AffiliateCTA.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import CompareTable from '@/components/CompareTable.astro'
+import { bySlug, ranked, localized } from '@/data/platforms'
+
+// 平台库文章路由：全部评测、对比、榜单渲染在 /zh/reviews/<slug>。
+export async function getStaticPaths() {
+  const entries = await getCollection('reviews', ({ data }) => !data.draft && data.lang === 'zh')
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^zh\//, '') },
+    props: { entry },
+  }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const d = entry.data
+const path = `/zh/reviews/${entry.id.replace(/^zh\//, '')}`
+const section = '平台库'
+const sectionHref = '/zh/reviews'
+
+let schema: Record<string, unknown>[] = []
+let reviewPlatform: ReturnType<typeof bySlug> = undefined
+let list: ReturnType<typeof ranked> = []
+let left: ReturnType<typeof bySlug> = undefined
+let right: ReturnType<typeof bySlug> = undefined
+let winner: 'left' | 'right' = 'left'
+
+// 相关链接可能指向板块内的指南，也可能指向平台库其他文章，跨合集查询。
+const articleCollections = ['reviews', 'prediction-markets', 'niche-sports', 'major-sports'] as const
+const related = (await Promise.all(
+  articleCollections.map((c) => getCollection(c, ({ data, id }) => d.related.includes(id) && !data.draft && data.lang === 'zh')),
+)).flat()
+const relatedPath = (r: { collection: string; id: string }) =>
+  r.collection === 'reviews'
+    ? `/zh/reviews/${r.id.replace(/^zh\//, '')}`
+    : `/zh/${r.collection}/${r.id.replace(/^zh\//, '')}`
+
+if (d.kind === 'review') {
+  reviewPlatform = bySlug(d.platformSlug)
+  if (!reviewPlatform) {
+    throw new Error(`Review "${entry.id}" references platformSlug "${d.platformSlug}" not in platforms.ts`)
+  }
+  schema = [{
+    '@type': 'Review',
+    name: d.title,
+    description: d.description,
+    dateModified: d.updated.toISOString(),
+    author: { '@type': 'Person', name: d.author },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: Object.values(reviewPlatform.scores).reduce((a, b) => a + b, 0) / 6,
+      bestRating: 10,
+      worstRating: 0,
+    },
+    itemReviewed: { '@type': 'Organization', name: reviewPlatform.name },
+  }]
+}
+
+if (d.kind === 'compare') {
+  left = bySlug(d.left)
+  right = bySlug(d.right)
+  if (!left || !right) throw new Error(`Comparison "${entry.id}" references unknown platform slug`)
+  winner = d.winner === d.left ? 'left' : 'right'
+  schema = [{ '@type': 'Article', headline: d.title, description: d.description, dateModified: d.updated.toISOString(), author: { '@type': 'Person', name: d.author } }]
+}
+
+if (d.kind === 'best') {
+  list = ranked(d.scope === 'all' ? undefined : d.scope)
+  schema = [{
+    '@type': 'ItemList',
+    name: d.title,
+    description: d.description,
+    itemListElement: list.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name })),
+  }]
+}
+---
+
+<ArticleLayout
+  title={d.title}
+  heading={d.title}
+  description={d.description}
+  path={path}
+  section={section}
+  sectionHref={sectionHref}
+  updated={d.updated}
+  author={d.author}
+  schema={schema}
+  lang="zh"
+>
+  {d.kind === 'review' && reviewPlatform && (
+    <>
+      <div class="callout">
+        <strong>结论</strong>
+        {d.verdict}
+      </div>
+
+      <div style="margin:1.6em 0;">
+        <AffiliateCTA
+          url={d.affiliate ? reviewPlatform.affiliateUrl : null}
+          platformName={reviewPlatform.name}
+          label={`打开 ${reviewPlatform.name}`}
+        />
+      </div>
+
+      <h2>速览</h2>
+      <div class="table-scroll">
+        <table>
+          <tbody>
+            <tr><th scope="row">手续费</th><td>{localized(reviewPlatform, 'fees', 'zh')}</td></tr>
+            <tr><th scope="row">最低入金</th><td>{localized(reviewPlatform, 'minDeposit', 'zh')}</td></tr>
+            <tr><th scope="row">出金方式</th><td>{localized(reviewPlatform, 'payoutMethods', 'zh')}</td></tr>
+            <tr><th scope="row">出金速度</th><td>{localized(reviewPlatform, 'payoutSpeed', 'zh')}</td></tr>
+            <tr><th scope="row">牌照</th><td>{localized(reviewPlatform, 'licence', 'zh')}</td></tr>
+            <tr><th scope="row">可用地区</th><td>{localized(reviewPlatform, 'regions', 'zh').join(', ')}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ScoreCard scores={reviewPlatform.scores} lang="zh" />
+
+      <div class="pros-cons">
+        <div>
+          <h4>优点</h4>
+          <ul>{d.pros.map((t) => <li>{t}</li>)}</ul>
+        </div>
+        <div>
+          <h4>缺点</h4>
+          <ul>{d.cons.map((t) => <li>{t}</li>)}</ul>
+        </div>
+      </div>
+
+      <div class="callout callout--warn">
+        <strong>哪些人不适合</strong>
+        {d.notFor}
+      </div>
+
+      <Content />
+    </>
+  )}
+
+  {d.kind === 'compare' && left && right && (
+    <>
+      <div class="callout">
+        <strong>胜出：{winner === 'left' ? left.name : right.name}</strong>
+        {d.verdict}
+      </div>
+
+      <CompareTable leftName={left.name} rightName={right.name} rows={d.rows} winner={winner} lang="zh" />
+
+      <Content />
+
+      <h2>两个平台，一眼对比</h2>
+      <div class="grid">
+        <PlatformCard platform={left} href={`/zh/reviews#platform-${left.slug}`} lang="zh" />
+        <PlatformCard platform={right} href={`/zh/reviews#platform-${right.slug}`} lang="zh" />
+      </div>
+    </>
+  )}
+
+  {d.kind === 'best' && (
+    <>
+      <p class="muted small">面向 {d.audience}</p>
+
+      <div class="callout">
+        <strong>这份榜单怎么排的</strong>
+        {d.criteria}
+      </div>
+
+      <Content />
+
+      <div class="grid" style="margin-top:2em;">
+        {list.map((p, i) => (
+          <PlatformCard platform={p} rank={i + 1} href={`/zh/reviews#platform-${p.slug}`} lang="zh" />
+        ))}
+      </div>
+    </>
+  )}
+
+  {related.length > 0 && (
+    <div style="margin-top:2.5em;">
+      <h2>继续阅读</h2>
+      <ul>
+        {related.map((r) => (
+          <li><a href={relatedPath(r)}>{r.data.title}</a></li>
+        ))}
+      </ul>
+    </div>
+  )}
+</ArticleLayout>

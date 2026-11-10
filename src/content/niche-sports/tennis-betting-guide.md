@@ -1,5 +1,5 @@
 ---
-title: "Tennis Betting Guide: Surface Type and Player Form"
+title: "Tennis Betting: Form Lies, the Surface Does Not"
 description: "Tennis is the closest niche sport to the mainstream, with mature markets. The three core markets and the variables that decide results: surface, injuries, form."
 kind: "guide"
 summary: "Tennis's three core markets (moneyline, game handicap, total games), plus the three variables that decide matches: surface, injuries, live form."

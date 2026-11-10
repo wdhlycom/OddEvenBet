@@ -1,7 +1,11 @@
 ---
 interface Crumb { label: string; href: string }
-interface Props { items: Crumb[] }
-const { items } = Astro.props
+interface Props {
+  items: Crumb[]
+  /** Whether the last crumb is the current page (rendered as text, not a link). */
+  current?: boolean
+}
+const { items, current = true } = Astro.props
 ---
 
 <nav aria-label="Breadcrumb" class="crumbs-bar small muted">
@@ -9,7 +13,7 @@ const { items } = Astro.props
     {items.map((item, i) => (
       <li style="display:flex; gap:8px; align-items:center;">
         {i > 0 && <span aria-hidden="true">/</span>}
-        {i === items.length - 1
+        {current && i === items.length - 1
           ? <span aria-current="page">{item.label}</span>
           : <a href={item.href} style="color: var(--ink-soft);">{item.label}</a>}
       </li>

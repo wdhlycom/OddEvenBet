@@ -1,0 +1,423 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Términos agrupados por deporte. Cada entrada: term=nombre, en=alias,
+// def=explicación de 2-3 frases, bet=qué significa para tu apuesta. El campo
+// opcional `to` enlaza al artículo en profundidad. A diferencia de la versión
+// inglesa, los grupos deportivos no llevan `href` porque todavía no hay guías
+// de deportes en español; enlazamos únicamente a artículos que existen.
+
+interface Term {
+  term: string
+  en?: string
+  def: string
+  bet: string
+  to?: string
+}
+
+interface Group {
+  sport: string
+  intro: string
+  terms: Term[]
+}
+
+// Índice por la primera letra del término. Letras en mayúscula, dígitos como '#'.
+function termKey(t: Term): string {
+  const head = t.term.trim()[0]
+  if (!head) return '#'
+  if (/[a-zA-Z]/.test(head)) return head.toUpperCase()
+  return '#'
+}
+
+const groups: Group[] = [
+  {
+    sport: 'Mercados generales',
+    intro:
+      'Mercados que puedes encontrar en cualquier deporte. Lee primero estos y luego los términos específicos de cada deporte.',
+    terms: [
+      {
+        term: 'Moneyline',
+        en: 'ganador directo',
+        def: 'La apuesta más simple: elige quién gana, no por cuánto. Los no favoritos pagan más porque son más difíciles de acertar.',
+        bet: 'El primer mercado para empezar. Practica aquí antes de tocar los hándicaps y los totales.',
+        to: '/es/essentials/los-tres-mercados-basicos',
+      },
+      {
+        term: 'Hándicap de puntos',
+        en: 'point spread',
+        def: 'Resta puntos al favorito o súmalos al no favorito, luego apuesta a quién cubre. «Local -7,5» significa que el local debe ganar por 8.',
+        bet: 'La trampa es que no apuestas quién gana, sino por cuánto. Los favoritos suelen ganar sin cubrir el hándicap.',
+        to: '/es/essentials/los-tres-mercados-basicos',
+      },
+      {
+        term: 'Más/menos',
+        en: 'totales / over-under',
+        def: 'Apuesta si la suma de puntos de los dos equipos supera o no un número fijado, no quién gana.',
+        bet: 'Útil cuando puedes leer el ritmo del partido pero no al ganador.',
+        to: '/es/essentials/los-tres-mercados-basicos',
+      },
+      {
+        term: 'Apuestas en vivo',
+        en: 'live betting',
+        def: 'Apostar después de empezar el partido; las cuotas se mueven con el marcador.',
+        bet: 'Muy rápidas y fáciles de perseguir. Aprende primero los mercados previos al partido.',
+      },
+    ],
+  },
+  {
+    sport: 'Fútbol',
+    intro: 'El mayor mercado de apuestas del mundo, y el que tiene más términos.',
+    terms: [
+      {
+        term: 'Hándicap asiático',
+        en: 'asian handicap',
+        def: 'Da un hándicap al favorito para igualar el partido. Las líneas enteras pueden anularse (reembolso); las líneas con ,5 siempre se liquidan.',
+        bet: 'Las líneas con ,5 nunca se anulan y son más fáciles para principiantes.',
+      },
+      {
+        term: '1X2',
+        def: 'Los tres resultados básicos del fútbol: 1 = victoria local, X = empate, 2 = victoria visitante.',
+        bet: 'Una apuesta a tres bandas con una estructura de cuotas más simple que un hándicap.',
+      },
+    ],
+  },
+  {
+    sport: 'Baloncesto (NBA)',
+    intro: 'El calendario más denso y con más variables; los términos giran en torno a las líneas y el descanso.',
+    terms: [
+      {
+        term: 'Back-to-back',
+        en: 'noches consecutivas',
+        def: 'Un equipo que juega en noches consecutivas; el segundo partido se juega con piernas cansadas.',
+        bet: 'Los favoritos en la segunda noche de un back-to-back se sorprenden más a menudo de lo normal.',
+      },
+      {
+        term: 'Load management',
+        en: 'gestión de carga',
+        def: 'Los equipos descansan deliberadamente a los titulares en algunas noches para reservarlos para partidos más importantes.',
+        bet: 'Revisa siempre quién descansa: una estrella ausente cambia toda la línea.',
+      },
+      {
+        term: 'Best-of-seven',
+        en: 'al mejor de siete',
+        def: 'El formato de playoffs; gana el primero en llegar a cuatro victorias.',
+        bet: 'Las series producen menos sorpresas que la eliminación directa.',
+      },
+    ],
+  },
+  {
+    sport: 'Fútbol americano (NFL)',
+    intro: 'Un partido por semana y un ritmo más lento; las lesiones y el hándicap son lo esencial.',
+    terms: [
+      {
+        term: 'Spread',
+        en: 'hándicap / point spread',
+        def: 'El hándicap de la NFL, misma idea que en baloncesto: resta puntos al favorito y apuesta a cubrir.',
+        bet: 'Los hándicaps de la NFL rondan los 3 puntos; los partidos se deciden por una sola anotación.',
+      },
+    ],
+  },
+  {
+    sport: 'Hockey sobre hielo (NHL)',
+    intro: 'Pocos goles y ritmo rápido; el portero y la puck line son clave.',
+    terms: [
+      {
+        term: 'Puck line',
+        en: 'línea de puck',
+        def: 'El hándicap del hockey, casi siempre de 1,5 goles. Como se marcan pocos goles, 1,5 es un margen grande.',
+        bet: 'Un 1,5 fijo significa que siempre necesitas ganar por dos, más difícil que el moneyline.',
+      },
+      {
+        term: 'Portero',
+        en: 'goaltender',
+        def: 'La posición más importante del hockey; un portero en racha puede parar 40 tiros por noche.',
+        bet: 'Revisa ambos porteros titulares antes de apostar: su forma importa más que el récord del equipo.',
+      },
+      {
+        term: 'Gol a portería vacía',
+        en: 'empty-net goal',
+        def: 'Un equipo que va perdiendo retira a su portero al final; el rival marca en la portería vacía.',
+        bet: 'Ocurre en los minutos finales y puede convertir una ventaja de un gol en dos, cambiando los totales.',
+      },
+    ],
+  },
+  {
+    sport: 'Béisbol (MLB)',
+    intro: 'La temporada más larga; el lanzador abridor decide la mayor parte del partido.',
+    terms: [
+      {
+        term: 'Lanzador abridor',
+        en: 'starting pitcher',
+        def: 'El lanzador que abre el partido y lanza la mayoría de las entradas; su forma decide el partido.',
+        bet: 'Revisa siempre ambos abridores: predicen el resultado mejor que el récord del equipo.',
+      },
+      {
+        term: 'Run line',
+        en: 'línea de carreras',
+        def: 'El hándicap del béisbol, normalmente 1,5 carreras. Las pocas anotaciones hacen de 1,5 un margen real.',
+        bet: 'Un 1,5 fijo significa ganar por dos: cuotas más altas que el moneyline pero más difícil.',
+      },
+    ],
+  },
+  {
+    sport: 'Artes marciales (UFC / MMA)',
+    intro: 'El tablero con más información; los cruces de estilo deciden todo.',
+    terms: [
+      {
+        term: 'Rondas',
+        en: 'over/under de rondas',
+        def: 'Apuesta si el combate llega a cierta ronda; depende del ritmo frente al estilo de desgaste.',
+        bet: 'La clave es el cruce de estilos, no la popularidad del luchador.',
+      },
+      {
+        term: 'Método de victoria',
+        en: 'method of victory',
+        def: 'KO/TKO, sumisión o decisión: el mercado propio de MMA con más información.',
+        bet: 'Paga mejor pero exige lectura técnica real; empieza por el moneyline.',
+      },
+      {
+        term: 'Grappler / striker',
+        en: 'lucha de suelo / golpeo',
+        def: 'La división básica de estilos: sumisiones en el suelo frente a nocauts de golpeo.',
+        bet: 'El estilo supera al nombre: un grappler ante un buen defensor de derribos puede quedar neutralizado.',
+      },
+      {
+        term: 'Corte de peso',
+        en: 'weight cut / pesaje',
+        def: 'Dar el peso el día anterior; un corte fallido drena energía y arruina tu análisis.',
+        bet: 'Revisa el pesaje: un mal corte rompe a un luchador más rápido que una brecha de habilidad.',
+      },
+    ],
+  },
+  {
+    sport: 'Esports',
+    intro: 'Un mercado joven; los términos giran en torno a series y mapas.',
+    terms: [
+      {
+        term: 'Ganador de mapa',
+        en: 'map winner',
+        def: 'Una apuesta a un solo mapa, mucho más volátil que el partido completo.',
+        bet: 'Las sorpresas por mapa superan a las del partido; empieza por el partido completo.',
+      },
+      {
+        term: 'Major',
+        def: 'El principal evento oficial de CS2, con controles maduros contra el amaño.',
+        bet: 'Los eventos de primer nivel son transparentes y más seguros para principiantes que las ligas menores.',
+      },
+    ],
+  },
+  {
+    sport: 'Críquet',
+    intro: 'Un gran mercado asiático; el formato y las condiciones son las variables clave.',
+    terms: [
+      {
+        term: 'T20 / ODI / Test',
+        en: 'T20 / ODI / Test',
+        def: 'Los tres formatos: el T20 dura unas 3 horas, el ODI unas 8 y un Test hasta 5 días; el ritmo y las tasas de sorpresa difieren.',
+        bet: 'El T20 es rápido y volátil, los Tests son lentos y favorecen al fuerte: conoce qué formato estás viendo.',
+      },
+      {
+        term: 'IPL',
+        def: 'La Indian Premier League, la liga de críquet más valiosa del mundo y un mercado de apuestas muy activo.',
+        bet: 'Los mercados más profundos de la temporada; un buen momento para aprender críquet.',
+      },
+      {
+        term: 'Toss',
+        en: 'sorteo / lanzamiento de moneda',
+        def: 'El lanzamiento de moneda previo que decide quién batea primero; una gran ventaja en algunos estadios.',
+        bet: 'El toss mueve las cuotas al instante: espera antes de apostar.',
+      },
+      {
+        term: 'Pitch',
+        en: 'terreno',
+        def: 'La superficie del terreno; la dureza y la humedad deciden si favorece al bate o a la bola.',
+        bet: 'Las características del pitch dominan los totales: revísalas primero.',
+      },
+    ],
+  },
+  {
+    sport: 'Tenis',
+    intro: 'La superficie lo decide todo.',
+    terms: [
+      {
+        term: 'Hándicap de juegos',
+        en: 'game handicap',
+        def: 'El jugador más fuerte cede juegos o sets; apuesta a cubrir.',
+        bet: 'Juzgar la brecha real importa más que el ranking.',
+      },
+      {
+        term: 'Total de juegos',
+        en: 'total games',
+        def: 'Apuesta si los juegos totales del partido superan o no un número.',
+        bet: 'Depende de la superficie: la pista dura alarga los peloteos, la hierba los acorta.',
+      },
+      {
+        term: 'Superficie',
+        en: 'surface',
+        def: 'Dura, arcilla y hierba se juegan a velocidades muy distintas; un jugador puede transformarse entre superficies.',
+        bet: 'Revisa siempre la superficie: un especialista en arcilla puede caer en hierba.',
+      },
+    ],
+  },
+  {
+    sport: 'Dardos',
+    intro: 'Un mercado de nicho rápido y lleno de sorpresas.',
+    terms: [
+      {
+        term: 'Total de 180',
+        en: 'total 180s',
+        def: 'Apuesta cuántos máximos (180) se logran en un partido.',
+        bet: 'Más una apuesta de novedad: mantén las apuestas pequeñas.',
+      },
+      {
+        term: 'Cierre más alto',
+        en: 'highest checkout',
+        def: 'Apuesta quién termina con el cierre más alto.',
+        bet: 'Divertida pero de alta varianza; una apuesta de novedad, no de investigación.',
+      },
+    ],
+  },
+  {
+    sport: 'Snooker',
+    intro: 'Premia el estudio; las variables giran en torno a las tacadas.',
+    terms: [
+      {
+        term: 'Tacada más alta',
+        en: 'highest break',
+        def: 'Apuesta quién logra la tacada simple más alta.',
+        bet: 'Depende de la forma reciente en tacadas: un poco de trabajo encuentra valor.',
+      },
+      {
+        term: 'Total de centenas',
+        en: 'total centuries',
+        def: 'Apuesta cuántas tacadas de centena (100+) aparecen.',
+        bet: 'Como la tacada más alta; premia a los jugadores que investigan.',
+      },
+    ],
+  },
+]
+
+// Datos estructurados: declarar cada entrada como DefinedTerm.
+const schema = groups.flatMap((g) =>
+  g.terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    name: t.term.split(' / ')[0],
+    alternateName: t.en,
+    description: `${t.def} ${t.bet}`,
+    inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'Glosario de apuestas deportivas' },
+  })),
+)
+
+// Índice por letra: recoger la clave de cada término, ordenada, enlazada a su ancla.
+const allTerms = groups.flatMap((g) => g.terms.map((t) => ({ key: termKey(t), g, t })))
+const indexMap = new Map<string, string>()
+for (const { key, g, t } of allTerms) {
+  if (!indexMap.has(key)) {
+    const i = g.terms.indexOf(t)
+    indexMap.set(key, `term-${key}-${i}`)
+  }
+}
+const indexKeys = [...indexMap.keys()].sort((a, b) => {
+  if (a === '#') return -1
+  if (b === '#') return 1
+  return a.localeCompare(b)
+})
+---
+
+<BaseLayout
+  title="Glosario de apuestas deportivas"
+  description="Términos de apuestas deportivas explicados por deporte: mercados, formatos y jerga, cada uno con qué es y qué significa para tu apuesta."
+  path="/es/glossary"
+  lang="es"
+  schema={schema}
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Glosario</span>
+      <h1>Glosario de apuestas deportivas</h1>
+      <p class="lede">
+        Mercados, formatos y jerga agrupados por deporte. Cada término explica qué es y qué
+        significa para tu apuesta, para que busques cualquier palabra que encuentres. Para los
+        conceptos básicos de mercado, empieza por los{' '}
+        <a href="/es/essentials/los-tres-mercados-basicos">tres mercados básicos</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    <nav style="margin-bottom:32px;">
+      <p class="muted small" style="margin:0 0 8px;">Explora por letra:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+        {indexKeys.map((k) => (
+          <a class="chip chip--idx" href={`#${indexMap.get(k)}`} style="text-decoration:none;">{k}</a>
+        ))}
+      </div>
+      <p class="muted small" style="margin:0 0 8px;">Ir a un deporte:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {groups.map((g) => (
+          <a class="chip" href={`#${g.sport}`} style="text-decoration:none;">{g.sport}</a>
+        ))}
+      </div>
+    </nav>
+
+    {groups.map((g) => (
+      <div id={g.sport} style="margin-top:40px;scroll-margin-top:80px;">
+        <h2 style="text-transform:none;">{g.sport}</h2>
+        <p class="muted">{g.intro}</p>
+        <dl class="glossary">
+          {g.terms.map((t, i) => (
+            <div class="glossary-item" id={`term-${termKey(t)}-${i}`} style="scroll-margin-top:80px;">
+              <dt>
+                {t.term}
+                {t.en && <span class="term-en">{t.en}</span>}
+                {t.to && (
+                  <a class="term-link" href={t.to}>A fondo →</a>
+                )}
+              </dt>
+              <dd>
+                <p>{t.def}</p>
+                <p class="term-bet"><strong>Qué significa para tu apuesta: </strong>{t.bet}</p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .glossary { margin: 0; }
+  .glossary-item {
+    padding: 16px 0;
+    border-top: 1px solid var(--border, #333);
+  }
+  .glossary-item:last-child { border-bottom: 1px solid var(--border, #333); }
+  .glossary-item dt {
+    font-weight: 700;
+    font-size: 1.05em;
+  }
+  .term-en {
+    font-weight: 400;
+    color: var(--muted, #888);
+    margin-left: 8px;
+    font-size: 0.9em;
+  }
+  .glossary-item dd { margin: 8px 0 0; }
+  .glossary-item dd p { margin: 0 0 6px; }
+  .term-bet { color: var(--muted, #999); font-size: 0.95em; }
+  .term-link { font-weight: 400; font-size: 0.85em; margin-left: 8px; }
+  .chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--border, #333);
+    border-radius: 999px;
+    font-size: 0.9em;
+  }
+  .chip--idx {
+    min-width: 32px;
+    text-align: center;
+    padding: 4px 8px;
+    font-weight: 600;
+  }
+</style>

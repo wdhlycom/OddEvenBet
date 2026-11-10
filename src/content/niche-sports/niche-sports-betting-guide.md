@@ -1,5 +1,5 @@
 ---
-title: "Niche Sports Betting Guide: Esports, Darts, Snooker, Tennis, F1, UFC and Cricket"
+title: "Niche Sports Betting: the Corner the Big Books Ignore"
 description: "Big books chase soccer and basketball; niche sports are where ordinary bettors have room. Seven niche sports—esports to cricket—in one map."
 kind: "explainer"
 summary: "Niche sports are a pocket for ordinary bettors: thinner books and sharper books, but the information gap is also your edge. Seven sports, one by one."

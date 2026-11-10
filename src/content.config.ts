@@ -155,5 +155,19 @@ export const collections = {
   'prediction-markets': topic('prediction-markets'),
   'niche-sports': topic('niche-sports'),
   'major-sports': topic('major-sports'),
+  /**
+   * REVIEWS — the platform hub. All review / compare / best pages live under
+   * /reviews/... (one home for platform content, matching the "Platforms" nav
+   * entry). Topic collections keep only guides and explainers. `section`
+   * assigns each article to the nav panel it appears in on the hub.
+   */
+  reviews: defineCollection({
+    loader: glob({ pattern: '**/*.md', base: './src/content/reviews' }),
+    schema: z.discriminatedUnion('kind', [
+      review.extend({ section: z.enum(['prediction-markets', 'niche-sports', 'major-sports']) }),
+      compare.extend({ section: z.enum(['prediction-markets', 'niche-sports', 'major-sports']) }),
+      best.extend({ section: z.enum(['prediction-markets', 'niche-sports', 'major-sports']) }),
+    ]),
+  }),
   essentials,
 }

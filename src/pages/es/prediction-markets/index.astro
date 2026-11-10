@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
+
+// División del trabajo: esta sección enseña los mercados de predicción y solo
+// guarda perfiles BREVES de plataformas; cada reseña, comparación y lista
+// ordenada vive en el centro de Plataformas (/reviews).
+const entries = (await getCollection('prediction-markets', ({ data }) => !data.draft && data.lang === 'es'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^es\//, '')
+
+const byKind = (k: string) => entries
+  .filter((e) => e.data.kind === k)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[] = [
+  { key: 'explainer', title: 'Entiende primero: lo básico', items: byKind('explainer') },
+  { key: 'guide', title: 'Guías', items: byKind('guide') },
+].filter((g) => g.items.length)
+
+const platformSlugs = ['polymarket', 'kalshi', 'limitless']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
+---
+
+<BaseLayout
+  title="Mercados de predicción: guías y explicaciones"
+  description="Explicaciones y guías claras sobre mercados de predicción como Polymarket y Kalshi: cómo funcionan, cuánto cuestan y dónde están los riesgos reales. Las reseñas de plataformas viven en el centro de Plataformas."
+  path="/es/prediction-markets"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Mercados de predicción</span>
+      <h1>Apunta a eventos reales, no contra la casa</h1>
+      <p class="lede">
+        Los mercados de predicción te dejan operar sobre elecciones, datos macro y eventos
+        mundiales contra otras personas, con un precio que se lee como una probabilidad.
+        Empieza por la mecánica y luego elige una plataforma en el centro de Plataformas.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {groups.map((g) => (
+      <div style="margin-top:32px;">
+        <h2>{g.title}</h2>
+        <div class="grid">
+          {g.items.map((e) => (
+            <article class="card card-link">
+              <span class="meta">{e.data.updated.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/es/prediction-markets/${slugOf(e)}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    {entries.length === 0 && (
+      <p class="muted">El contenido en español se está redactando poco a poco.</p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>Las principales plataformas, en breve</h2>
+        <p class="muted" style="max-width:52ch;">
+          Perfiles de una línea aquí. Las reseñas detalladas y las comparaciones lado a lado
+          están en el <a href="/es/reviews">centro de Plataformas</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} lang="es" href={`/es/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

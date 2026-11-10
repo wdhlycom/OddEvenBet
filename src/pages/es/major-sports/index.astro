@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
+
+// División del trabajo: las guías de deportes se quedan aquí; las reseñas,
+// comparaciones y listas ordenadas viven en el centro de Plataformas (/reviews).
+// Esta sección guarda solo perfiles breves de las casas con licencia.
+const entries = (await getCollection('major-sports', ({ data }) => !data.draft && data.lang === 'es'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^es\//, '')
+
+const guides = entries.filter((e) => e.data.kind === 'guide')
+
+const platformSlugs = ['draftkings', 'bet365']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
+---
+
+<BaseLayout
+  title="Apuestas de deportes principales: las grandes ligas y las mejores casas"
+  description="Aprende lo básico para apostar en fútbol, NFL, NBA, MLB y NHL, y luego elige una casa con licencia: perfiles breves aquí, reseñas completas en el centro de Plataformas."
+  path="/es/major-sports"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Deportes principales</span>
+      <h1>Las grandes ligas, sin ruido</h1>
+      <p class="lede">
+        La Premier League, la NBA, la NFL y las demás grandes competiciones las cubren todos
+        los sitios de internet. Nosotros lo mantenemos ligero: primero entiende el deporte y
+        sus mercados, luego elige una casa con licencia, sin relleno.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {guides.length > 0 && (
+      <div style="margin-top:32px;">
+        <h2>Entiende el deporte primero</h2>
+        <div class="grid">
+          {guides.map((e) => (
+            <article class="card card-link">
+              <span class="meta">Guía · {e.data.updated.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/es/major-sports/${slugOf(e)}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {entries.length === 0 && (
+      <p class="muted">El contenido en español se está redactando poco a poco.</p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>Casas con licencia, en breve</h2>
+        <p class="muted" style="max-width:52ch;">
+          Perfiles de una línea aquí. Las reseñas, comparaciones y listas ordenadas están en
+          el <a href="/es/reviews">centro de Plataformas</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} lang="es" href={`/es/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

@@ -4,11 +4,12 @@ import { site } from '@/data/site'
 import type { APIContext } from 'astro'
 
 export async function GET(context: APIContext) {
-  const [essentials, predictionMarkets, nicheSports, majorSports] = await Promise.all([
+  const [essentials, predictionMarkets, nicheSports, majorSports, reviews] = await Promise.all([
     getCollection('essentials', ({ data }) => !data.draft),
     getCollection('prediction-markets', ({ data }) => !data.draft),
     getCollection('niche-sports', ({ data }) => !data.draft),
     getCollection('major-sports', ({ data }) => !data.draft),
+    getCollection('reviews', ({ data }) => !data.draft),
   ])
 
   const items = [
@@ -35,6 +36,15 @@ export async function GET(context: APIContext) {
       description: e.data.description,
       pubDate: e.data.updated,
       link: `/major-sports/${e.id}/`,
+    })),
+    // Platform hub articles (review / compare / best) render under /reviews/.
+    ...reviews.map((e) => ({
+      title: e.data.title,
+      description: e.data.description,
+      pubDate: e.data.updated,
+      link: e.id.startsWith('zh/')
+        ? `/zh/reviews/${e.id.slice(3)}/`
+        : `/reviews/${e.id}/`,
     })),
   ].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf())
 

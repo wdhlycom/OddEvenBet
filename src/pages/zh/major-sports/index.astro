@@ -1,14 +1,25 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
 
+// 分工：运动入门指南留在这里；评测、对比、榜单收在平台库（/zh/reviews）。
+// 本板块只放与主流联赛相关的持牌平台简介卡。
 const entries = (await getCollection('major-sports', ({ data }) => !data.draft && data.lang === 'zh'))
   .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const guides = entries.filter((e) => e.data.kind === 'guide')
+
+// 主流联赛优先放持牌平台。slug 与 platforms.ts 一致；加密平台放在冷门运动板块。
+// 每张卡深链到平台库里该平台的分组。
+const platformSlugs = ['draftkings', 'bet365']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
 ---
 
 <BaseLayout
   title="主流体育博彩：足球、NFL、NBA、MLB（中文）"
-  description="主流体育博彩的中文指南——足球、NFL、NBA、MLB 的下注基础，中文原创内容。"
+  description="主流体育博彩的中文指南——足球、NFL、NBA、MLB、NHL 的下注基础；持牌平台简介在这里，完整评测在平台库。"
   path="/zh/major-sports"
   lang="zh"
 >
@@ -17,24 +28,37 @@ const entries = (await getCollection('major-sports', ({ data }) => !data.draft &
       <span class="eyebrow">主流体育</span>
       <h1>盘口最深的市场</h1>
       <p class="lede">
-        足球、NFL、NBA、MLB 是博彩的主战场。盘口深、信息全，但你的对手也最专业。这里按中文读者的习惯原创撰写。
+        足球、NFL、NBA、MLB 是博彩的主战场。盘口深、信息全，但你的对手也最专业。先看懂运动和盘口，再选平台。
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
-    {entries.length > 0 ? (
-      <div class="grid">
-        {entries.map((e) => (
-          <article class="card card-link">
-            <span class="meta">{e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
-            <h3><a href={`/zh/major-sports/${e.id.replace(/^zh\//, '')}`}>{e.data.title}</a></h3>
-            <p>{e.data.summary}</p>
-          </article>
-        ))}
+    {guides.length > 0 && (
+      <div style="margin-top:32px;">
+        <h2>先看懂运动</h2>
+        <div class="grid">
+          {guides.map((e) => (
+            <article class="card card-link">
+              <span class="meta">指南 · {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+              <h3><a href={`/zh/major-sports/${e.id.replace(/^zh\//, '')}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
       </div>
-    ) : (
-      <p class="muted">中文内容正在逐步撰写中，敬请期待。</p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>持牌平台，一眼看懂</h2>
+        <p class="muted" style="max-width:52ch;">
+          这里只有一句话简介。详细的评测、对比和榜单都在<a href="/zh/reviews">平台库</a>。
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} href={`/zh/reviews#platform-${p.slug}`} lang="zh" />)}
+        </div>
+      </div>
     )}
   </section>
 </BaseLayout>

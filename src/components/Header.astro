@@ -33,7 +33,7 @@ const routes = await allRoutes()
 const navItems = nav
   .map((item) => ({
     href: activeLocale.prefix + item.href,
-    label: activeLocale.code === 'zh' ? item.labelZh : item.label,
+    label: activeLocale.code === 'zh' ? item.labelZh : activeLocale.code === 'es' ? item.labelEs : item.label,
   }))
   .filter((item) => routes.has(item.href))
 ---

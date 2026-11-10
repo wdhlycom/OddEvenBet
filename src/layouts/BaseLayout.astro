@@ -19,7 +19,9 @@ interface Props {
 
 const { title, description, path, lang = 'en', schema = [], noindex = false } = Astro.props
 const canonical = new URL(path, site.domain).href
-const pageTitle = path === '/' ? title : `${title} — ${site.name}`
+// Page titles are used verbatim — no site-name suffix. Titles are written to fit
+// the ~60 character SERP budget on their own, and a suffix pushed them past it.
+const pageTitle = title
 
 /**
  * hreflang alternates. Only emitted for genuine translations of this page —
@@ -64,6 +66,9 @@ const siteGraph = [
         var s = localStorage.getItem('theme')
         var d = window.matchMedia('(prefers-color-scheme: dark)').matches
         document.documentElement.dataset.theme = s || (d ? 'dark' : 'light')
+        // JS flag for progressive enhancement (e.g. the Platforms tab panels
+        // only collapse to one visible panel when JS is available).
+        document.documentElement.classList.add('js')
       })()
     </script>
 

@@ -1,5 +1,5 @@
 ---
-title: "Darts Betting Guide: Fast Pace, Lots of Upsets"
+title: "Darts Betting: the Upsets Are the Whole Point"
 description: "Darts: simple markets, short matches, fast pace—great for beginners. But top players are tightly matched and upsets are common. The four core dart markets explained."
 kind: "guide"
 summary: "Darts' four core markets—match winner, handicap, total 180s and highest checkout—plus the top players' tight margins and frequent upsets."

@@ -1,5 +1,5 @@
 ---
-title: "MLB Baseball Betting Guide: Moneyline Odds and the Run Line"
+title: "MLB Betting: One Player Moves the Line More Than the Team"
 description: "MLB's odds structure differs from other sports, built on the moneyline and the run line. The starting pitcher drives the game, and single games swing hard."
 kind: "guide"
 summary: "MLB's two core markets (moneyline / run line), and the starting pitcher — baseball's one truly unique variable."

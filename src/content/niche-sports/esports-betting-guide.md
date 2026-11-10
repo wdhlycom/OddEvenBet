@@ -1,5 +1,5 @@
 ---
-title: "How to Bet on Esports: A Beginner's Guide to Avoiding Traps"
+title: "Esports Betting: Patches Move the Odds, Not Results"
 description: "Esports betting looks like traditional sports, but the traps differ. Patches, roster moves and match-fixing wreck your read—here are the core markets."
 kind: "guide"
 summary: "The basics of esports betting: market types, the impact of patches, match-fixing risk, and why you should only bet the games you actually follow."

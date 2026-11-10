@@ -1,0 +1,171 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { bySlug, ranked } from '@/data/platforms'
+
+/**
+ * El centro de plataformas. Tres paneles intercambiables que coinciden con las
+ * secciones de la navegación, para que la página se mantenga corta a medida que
+ * crece el contenido. Cada reseña / comparación / lista vive AQUÍ bajo
+ * /reviews/... (colección `reviews`). Dentro de cada panel, los artículos se
+ * agrupan por plataforma con un ancla (#platform-<slug>) — ese ancla es a donde
+ * enlazan las tarjetas de puntuación de todo el sitio.
+ */
+const tabs = [
+  { key: 'prediction-markets', label: 'Mercados de predicción', cls: 'tab--prediction-markets' },
+  { key: 'niche-sports', label: 'Deportes de nicho', cls: 'tab--niche-sports' },
+  { key: 'major-sports', label: 'Deportes principales', cls: 'tab--major-sports' },
+] as const
+
+type TabKey = (typeof tabs)[number]['key']
+const platformType: Record<TabKey, 'prediction-market' | 'sportsbook'> = {
+  'prediction-markets': 'prediction-market',
+  'niche-sports': 'sportsbook',
+  'major-sports': 'sportsbook',
+}
+
+const entries = (await getCollection('reviews', ({ data }) => !data.draft && data.lang === 'es'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^es\//, '')
+
+const kindLabel: Record<string, string> = { review: 'Reseña', compare: 'Comparación', best: 'Mejores' }
+const dateLabel = (d: Date) => d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })
+
+/** Modelo de vista por panel: las listas "mejores" arriba, luego un grupo por plataforma. */
+const panel = (key: TabKey) => {
+  const items = entries.filter((e) => e.data.section === key)
+  const bests = items.filter((e) => e.data.kind === 'best')
+  // Las reseñas se agrupan bajo su plataforma; las comparaciones aparecen bajo
+  // AMBOS lados, para que cada plataforma mencionada tenga su ancla #platform-<slug>.
+  const byPlatform = new Map<string, typeof items>()
+  for (const e of items) {
+    const slugs = e.data.kind === 'review'
+      ? [e.data.platformSlug]
+      : e.data.kind === 'compare'
+        ? [e.data.left, e.data.right]
+        : []
+    for (const slug of slugs) {
+      if (!byPlatform.has(slug)) byPlatform.set(slug, [])
+      byPlatform.get(slug)!.push(e)
+    }
+  }
+  const groups = ranked(platformType[key])
+    .filter((p) => byPlatform.has(p.slug))
+    .map((p) => ({ platform: p, items: byPlatform.get(p.slug)! }))
+  return { bests, groups }
+}
+---
+
+<BaseLayout
+  title="Plataformas: reseñas, comparaciones y listas ordenadas"
+  description="Cada reseña de plataforma, comparación lado a lado y lista ordenada, agrupada por sección y por plataforma. Las tarjetas de puntuación de todo el sitio enlazan aquí."
+  path="/es/reviews"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Plataformas</span>
+      <h1>Reseñas, comparaciones y listas ordenadas</h1>
+      <p class="lede">
+        Todo lo que hemos publicado sobre las plataformas, agrupado por sección y por
+        plataforma. Las puntuaciones salen de las seis dimensiones ponderadas de nuestra
+        <a href="/es/methodology">metodología</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    <!--
+      Tres paneles paralelos, uno por sección de la navegación. Sin JavaScript
+      todos los paneles se muestran apilados (mejora progresiva: ocultar los
+      paneles inactivos solo aplica bajo .js, fijado antes del primer pintado en
+      BaseLayout).
+    -->
+    <div class="tab-bar" role="tablist" aria-label="Secciones de plataformas" style="margin-top:36px;">
+      {tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${tab.key}`}
+          class:list={[tab.cls, { 'is-active': i === 0 }]}
+          aria-controls={`panel-${tab.key}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {tabs.map((tab, i) => {
+      const { bests, groups } = panel(tab.key)
+      return (
+        <div
+          role="tabpanel"
+          id={`panel-${tab.key}`}
+          aria-labelledby={`tab-${tab.key}`}
+          class:list={['tab-panel', { 'is-active': i === 0 }]}
+        >
+          {bests.length > 0 && (
+            <div class="grid" style="margin-bottom:8px;">
+              {bests.map((e) => (
+                <article class="card card-link">
+                  <span class="meta">{kindLabel[e.data.kind]} · {dateLabel(e.data.updated)}</span>
+                  <h3><a href={`/es/reviews/${slugOf(e)}`}>{e.data.title}</a></h3>
+                  <p>{e.data.summary}</p>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {groups.map(({ platform, items }) => (
+            <div class="plat-group" id={`platform-${platform.slug}`} style="margin-top:36px;">
+              <p class="eyebrow" style="margin-bottom:10px;">{platform.name}</p>
+              <div class="grid">
+                {items.map((e) => (
+                  <article class="card card-link">
+                    <span class="meta">{kindLabel[e.data.kind] ?? e.data.kind} · {dateLabel(e.data.updated)}</span>
+                    <h3><a href={`/es/reviews/${slugOf(e)}`}>{e.data.title}</a></h3>
+                    <p>{e.data.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {bests.length === 0 && groups.length === 0 && (
+            <p class="muted">Las reseñas de esta sección se están escribiendo.</p>
+          )}
+        </div>
+      )
+    })}
+  </section>
+
+  <script>
+    // Cambio de pestañas: un panel visible a la vez. Sin framework: los paneles
+    // son DOM plano, y sin JS todo queda visible apilado. Enlaces profundos:
+    // /reviews#platform-<slug> abre el panel correcto y hace scroll hasta el
+    // grupo de esa plataforma (usado por las tarjetas de puntuación del sitio).
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.tab-bar [role="tab"]')
+    const activate = (tab: Element) => {
+      tabs.forEach((t) => {
+        t.classList.remove('is-active')
+        t.setAttribute('aria-selected', 'false')
+      })
+      tab.classList.add('is-active')
+      tab.setAttribute('aria-selected', 'true')
+      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('is-active'))
+      document.getElementById(tab.getAttribute('aria-controls') ?? '')?.classList.add('is-active')
+    }
+    tabs.forEach((tab) => tab.addEventListener('click', () => activate(tab)))
+
+    const target = location.hash ? document.getElementById(location.hash.slice(1)) : null
+    if (target) {
+      const panelEl = target.closest('.tab-panel')
+      const ownerId = panelEl?.getAttribute('aria-labelledby')
+      const owner = ownerId ? document.getElementById(ownerId) : null
+      if (owner && !owner.classList.contains('is-active')) activate(owner)
+      target.scrollIntoView({ block: 'start' })
+    }
+  </script>
+</BaseLayout>

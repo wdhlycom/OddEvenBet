@@ -1,12 +1,14 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
 
+// 分工：本板块负责讲清预测市场，平台只留简介卡；
+// 详细评测、对比、榜单全部收在平台库（/zh/reviews）。
 const entries = (await getCollection('prediction-markets', ({ data }) => !data.draft && data.lang === 'zh'))
   .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
 
-// 逻辑分组：先讲解（概念），再指南，再评测/对比/榜单
-const kindOrder = { explainer: 1, guide: 2, review: 3, compare: 4, best: 5 } as const
 const byKind = (k: string) => entries
   .filter((e) => e.data.kind === k)
   .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
@@ -14,15 +16,16 @@ const byKind = (k: string) => entries
 const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[] = [
   { key: 'explainer', title: '先搞懂：基础概念', items: byKind('explainer') },
   { key: 'guide', title: '实操指南', items: byKind('guide') },
-  { key: 'review', title: '平台评测', items: byKind('review') },
-  { key: 'compare', title: '平台对比', items: byKind('compare') },
-  { key: 'best', title: '榜单', items: byKind('best') },
 ].filter((g) => g.items.length)
+
+// 只放简介卡——评测/对比文章不在这里。每张卡深链到平台库里该平台的分组。
+const platformSlugs = ['polymarket', 'kalshi', 'limitless']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
 ---
 
 <BaseLayout
-  title="预测市场：评测、对比与指南（中文）"
-  description="对 Polymarket、Kalshi 等预测市场的实测评测、对比和指南——真实事件，结果可查。"
+  title="预测市场：概念讲解与实操指南（中文）"
+  description="用大白话讲清 Polymarket、Kalshi 等预测市场怎么运作、费用怎么算、风险在哪里。平台评测收在平台库。"
   path="/zh/prediction-markets"
   lang="zh"
 >
@@ -31,19 +34,19 @@ const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[]
       <span class="eyebrow">预测市场</span>
       <h1>押注真实事件，而不是庄家</h1>
       <p class="lede">
-        预测市场让你就选举、宏观数据、世界大事和别人交易——价格就是可能性。我们评测平台、讲清机制、指出真正有风险的地方。
+        预测市场让你就选举、宏观数据、世界大事和别人交易——价格就是可能性。先看懂机制，再去平台库挑场地。
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
     {groups.map((g) => (
-      <div style="margin-top:40px;">
+      <div style="margin-top:32px;">
         <h2>{g.title}</h2>
         <div class="grid">
           {g.items.map((e) => (
             <article class="card card-link">
-              <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+              <span class="meta">{e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
               <h3><a href={`/zh/prediction-markets/${e.id.replace(/^zh\//, '')}`}>{e.data.title}</a></h3>
               <p>{e.data.summary}</p>
             </article>
@@ -52,8 +55,16 @@ const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[]
       </div>
     ))}
 
-    {entries.length === 0 && (
-      <p class="muted">中文内容正在逐步撰写中，敬请期待。</p>
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>主要平台，一眼看懂</h2>
+        <p class="muted" style="max-width:52ch;">
+          这里只有一句话简介。详细的评测和对比都在<a href="/zh/reviews">平台库</a>。
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} href={`/zh/reviews#platform-${p.slug}`} lang="zh" />)}
+        </div>
+      </div>
     )}
   </section>
 </BaseLayout>

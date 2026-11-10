@@ -9,18 +9,58 @@ const activeLocale =
   locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
   locales[0]
 const prefix = activeLocale.prefix
+const lang = activeLocale.code as 'en' | 'zh' | 'es'
 
-// Spanish has no glossary or responsible-gambling page yet; filter those out
-// rather than shipping links that 404.
+/** Footer copy follows the reader's language; the brand name never translates. */
+const t = {
+  en: {
+    description: site.description,
+    trust: 'Trust',
+    glossary: 'Glossary',
+    disclosure: site.disclosureShort,
+    risk: 'Gambling involves risk — only stake what you can afford to lose. 18+ / 21+ where required.',
+    helpBefore: 'If gambling is affecting your life, see our',
+    helpLink: 'responsible gambling resources',
+    rights: 'All rights reserved.',
+  },
+  zh: {
+    description:
+      '真实的赛事预测市场与持牌体育博彩，独立研究。上手评测、横向对比、说人话的讲解——只聊有明确结果、可以核对的赛事，不碰赌场类玩法。评分方法公开，谁给我们钱也写清楚。',
+    trust: '信任',
+    glossary: '术语表',
+    disclosure:
+      '本站部分链接是联盟链接。如果你通过其中一个注册，我们可能获得佣金——这不会改变我们的评分。',
+    risk: '博彩有风险，请只投入你能承受损失的钱。部分地区要求年满 18 岁或 21 岁。',
+    helpBefore: '如果博彩已经影响到你的生活，请看我们的',
+    helpLink: '理性博彩资源',
+    rights: '保留所有权利。',
+  },
+  es: {
+    description:
+      'Investigación independiente sobre mercados de predicción de eventos reales y casas de apuestas con licencia. Reseñas prácticas, comparativas y explicaciones claras: solo eventos con un resultado real y comprobable, no juegos de casino. Publicamos nuestro método de puntuación y decimos quién nos paga.',
+    trust: 'Confianza',
+    glossary: 'Glosario',
+    disclosure:
+      'Algunos enlaces de este sitio son de afiliado. Si te registras a través de uno, podemos recibir una comisión; nunca cambia nuestra puntuación.',
+    risk: 'Apostar conlleva riesgo: apuesta solo lo que puedas permitirte perder. 18+ / 21+ donde se exija.',
+    helpBefore: 'Si el juego está afectando tu vida, consulta nuestros',
+    helpLink: 'recursos de juego responsable',
+    rights: 'Todos los derechos reservados.',
+  },
+}[lang]
+
+// Spanish has no glossary page filter: skip any trust link whose page does not
+// exist yet rather than shipping a 404.
 const routes = await allRoutes()
 const exists = (href: string) => routes.has(href)
 const trustLinks = trustNav
   .map((item) => ({
     href: prefix + item.href,
-    label: prefix === '/zh' ? item.labelZh : item.label,
+    label: prefix === '/zh' ? item.labelZh : prefix === '/es' ? item.labelEs : item.label,
   }))
   .filter((item) => exists(item.href))
 const glossaryHref = prefix + '/glossary'
+const responsibleHref = prefix + '/responsible-gambling'
 ---
 
 <footer class="site-foot">
@@ -28,28 +68,30 @@ const glossaryHref = prefix + '/glossary'
     <div class="foot-grid">
       <div style="max-width: 42ch;">
         <strong style="color:#f4f1ea;">{site.name}</strong>
-        <p style="margin: 8px 0 0;">{site.description}</p>
+        <p style="margin: 8px 0 0;">{t.description}</p>
       </div>
       <div>
-        <strong style="color:#f4f1ea;">{prefix === '/zh' ? '信任' : 'Trust'}</strong>
+        <strong style="color:#f4f1ea;">{t.trust}</strong>
         <div class="foot-links">
           {trustLinks.map((item) => (
             <a href={item.href}>{item.label}</a>
           ))}
-          {exists(glossaryHref) && (
-            <a href={glossaryHref}>{prefix === '/zh' ? '术语表' : 'Glossary'}</a>
-          )}
+          {exists(glossaryHref) && <a href={glossaryHref}>{t.glossary}</a>}
         </div>
       </div>
     </div>
 
     <div class="foot-legal">
       <p style="margin: 0 0 10px;">
-        {site.disclosureShort} Gambling involves risk — only stake what you can afford to lose.
-        18+ / 21+ where required. If gambling is affecting your life, see our{' '}
-        <a href={prefix + '/responsible-gambling'}>responsible gambling resources</a>.
+        {t.disclosure} {t.risk}
+        {exists(responsibleHref) && (
+          <>
+            {' '}{t.helpBefore}{lang === 'zh' ? '' : ' '}
+            <a href={responsibleHref}>{t.helpLink}</a>{lang === 'zh' ? '。' : '.'}
+          </>
+        )}
       </p>
-      <p style="margin: 0; text-align: center;">&copy; {year} {site.name}. All rights reserved.</p>
+      <p style="margin: 0; text-align: center;">&copy; {year} {site.name}. {t.rights}</p>
     </div>
   </div>
 </footer>

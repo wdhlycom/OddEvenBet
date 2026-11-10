@@ -1,5 +1,5 @@
 ---
-title: "Polymarket 还是 Kalshi：新手到底选哪个"
+title: "Polymarket 还是 Kalshi：一个问题就能定"
 description: "Polymarket 深度最好、没有牌照靠山；Kalshi 有美国监管、对新手友好、但市场范围窄。这篇把两者的差别讲透，帮你对号入座。"
 kind: "guide"
 summary: "Polymarket 深度好、无监管靠山；Kalshi 有 CFTC 监管、新手友好、但市场窄。按你的身份和需求对号入座。"

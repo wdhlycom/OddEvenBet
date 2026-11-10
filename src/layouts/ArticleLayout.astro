@@ -26,34 +26,48 @@ const {
   updated, author, showByline = true, schema = [],
 } = Astro.props
 
+// Language is derived from the URL prefix (en has none). Article pages always
+// carry the full path with their language prefix, so this is reliable and
+// means the [slug].astro files don't each have to remember to pass `lang`.
+const lang: 'en' | 'zh' | 'es' = path.startsWith('/es/') ? 'es' : path.startsWith('/zh/') ? 'zh' : 'en'
+
+const ui = {
+  en: { home: 'Home', by: 'By', updated: 'Updated', how: 'How we research this', methodology: '/methodology' },
+  zh: { home: '首页', by: '作者', updated: '更新于', how: '我们的研究方法', methodology: '/zh/methodology' },
+  es: { home: 'Inicio', by: 'Por', updated: 'Actualizado', how: 'Cómo investigamos esto', methodology: '/es/methodology' },
+}[lang]
+
+// Breadcrumbs stop at the section, not the article. Repeating a long headline
+// in the trail wrapped onto three lines on phones and added nothing — the H1
+// directly below already names the page.
 const crumbs: Crumb[] = [
-  { label: 'Home', href: '/' },
+  { label: ui.home, href: '/' },
   { label: section, href: sectionHref },
-  { label: heading, href: path },
 ]
 
-const dateLabel = updated.toLocaleDateString('en-US', {
-  year: 'numeric', month: 'long', day: 'numeric',
-})
+const dateLabel = updated.toLocaleDateString(
+  lang === 'zh' ? 'zh-CN' : lang === 'es' ? 'es-ES' : 'en-US',
+  { year: 'numeric', month: 'long', day: 'numeric' },
+)
 ---
 
-<BaseLayout title={title} description={description} path={path} schema={schema}>
+<BaseLayout title={title} description={description} path={path} lang={lang} schema={schema}>
   <header class="page-masthead">
     <div class="wrap">
       <span class="eyebrow">{section}</span>
       <h1>{heading}</h1>
       {showByline && (
         <p class="muted small" style="margin: 14px 0 0;">
-          By {author} · Updated {dateLabel}
+          {ui.by} {author} · {ui.updated} {dateLabel}
           {' · '}
-          <a href="/methodology">How we research this</a>
+          <a href={ui.methodology}>{ui.how}</a>
         </p>
       )}
     </div>
   </header>
 
   <article class="wrap" style="padding-block: 32px 20px;">
-    <Breadcrumbs items={crumbs} />
+    <Breadcrumbs items={crumbs} current={false} />
 
     <div class="prose measure">
       <slot />

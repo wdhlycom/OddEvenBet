@@ -7,28 +7,34 @@ interface Props {
   platform: Platform
   /** 1-based position, shown as a badge on ranking pages. */
   rank?: number
-  /** Whether a published review exists to link to. */
-  reviewSlug?: string
-  /** Language for labels. Defaults to English; pass "zh" for Chinese. */
-  lang?: 'en' | 'zh'
+  /**
+   * Where this card leads — usually the platform's own group on the Platforms
+   * hub (`/reviews#platform-<slug>`), where every article about it is listed.
+   * When set, the WHOLE card is clickable via a stretched link; the affiliate
+   * CTA stays independently clickable above the overlay.
+   */
+  href?: string
+  /** Language for labels. Defaults to English; pass "zh" or "es". */
+  lang?: 'en' | 'zh' | 'es'
 }
 
-const { platform: p, rank, reviewSlug, lang = 'en' } = Astro.props
-const score = Object.values(p.scores).reduce((a, b) => a + b, 0) / Object.keys(p.scores).length
+const { platform: p, rank, href, lang = 'en' } = Astro.props
 
+// Scores are deliberately NOT shown here: the raw number without its rubric
+// reads as arbitrary (and every honest score looks "low"). The six-dimension
+// breakdown lives in each full review and on /methodology.
 const t = lang === 'zh'
   ? { fees: '手续费', payout: '出金', licence: '牌照', open: '打开' }
-  : { fees: 'Fees', payout: 'Payout', licence: 'Licence', open: 'Open' }
+  : lang === 'es'
+    ? { fees: 'Comisiones', payout: 'Pago', licence: 'Licencia', open: 'Abrir' }
+    : { fees: 'Fees', payout: 'Payout', licence: 'Licence', open: 'Open' }
 ---
 
-<article class="card">
-  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
-    <h3>
-      {rank && <span class="muted" style="margin-right:6px;">#{rank}</span>}
-      {reviewSlug ? <a href={reviewSlug}>{p.name}</a> : p.name}
-    </h3>
-    <span class="score">{score.toFixed(1)}<small>/10</small></span>
-  </div>
+<article class="card pcard">
+  <h3>
+    {rank && <span class="muted" style="margin-right:6px;">#{rank}</span>}
+    {href ? <a class="pcard-link" href={href}>{p.name}</a> : p.name}
+  </h3>
 
   <p>{localized(p, 'oneLiner', lang)}</p>
 

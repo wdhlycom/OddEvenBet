@@ -1,5 +1,5 @@
 ---
-title: "How to Bet on US Elections: A Prediction-Market Guide"
+title: "Election Betting: the Rule Text Beats the Polls"
 description: "Betting elections isn't backing who you support; it's who others will pick. Election market types, reading prices, and why your own politics is the biggest trap."
 kind: "guide"
 summary: "How to bet election prediction markets: the categories (president/Senate/swing states/popular vote), how to read prices, common judgement errors, and why your own stance is the biggest trap."

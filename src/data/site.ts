@@ -28,19 +28,21 @@ export const locales = [
 export type LocaleCode = (typeof locales)[number]['code']
 
 export const nav = [
-  { label: 'Essentials', labelZh: '必备', href: '/essentials' },
-  { label: 'Prediction Markets', labelZh: '预测市场', href: '/prediction-markets' },
-  { label: 'Niche Sports', labelZh: '冷门运动', href: '/niche-sports' },
-  { label: 'Major Sports', labelZh: '热门运动', href: '/major-sports' },
-  { label: 'Reviews', labelZh: '评测', href: '/reviews' },
-  { label: 'About', labelZh: '关于', href: '/about' },
-  { label: 'Glossary', labelZh: '术语表', href: '/glossary' },
+  { label: 'Essentials', labelZh: '必备', labelEs: 'Esenciales', href: '/essentials' },
+  { label: 'Prediction Markets', labelZh: '预测市场', labelEs: 'Mercados de predicción', href: '/prediction-markets' },
+  { label: 'Niche Sports', labelZh: '冷门运动', labelEs: 'Deportes de nicho', href: '/niche-sports' },
+  { label: 'Major Sports', labelZh: '热门运动', labelEs: 'Deportes principales', href: '/major-sports' },
+  // "Platforms" not "Reviews": /reviews is the platform directory (one score
+  // card per venue), while review articles live inside each section.
+  { label: 'Platforms', labelZh: '平台库', labelEs: 'Plataformas', href: '/reviews' },
+  { label: 'About', labelZh: '关于', labelEs: 'Sobre nosotros', href: '/about' },
+  { label: 'Glossary', labelZh: '术语表', labelEs: 'Glosario', href: '/glossary' },
 ] as const
 
 export const trustNav = [
-  { label: 'Methodology', labelZh: '评分方法', href: '/methodology' },
-  { label: 'Disclosure', labelZh: '披露', href: '/disclosure' },
-  { label: 'Responsible Gambling', labelZh: '理性博彩', href: '/responsible-gambling' },
+  { label: 'Methodology', labelZh: '评分方法', labelEs: 'Metodología', href: '/methodology' },
+  { label: 'Disclosure', labelZh: '披露', labelEs: 'Divulgación', href: '/disclosure' },
+  { label: 'Responsible Gambling', labelZh: '理性博彩', labelEs: 'Juego responsable', href: '/responsible-gambling' },
 ] as const
 
 /**

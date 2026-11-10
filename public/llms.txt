@@ -5,16 +5,24 @@ OddEvenBet publishes independent, plain-English research on real-event predictio
 ## Core pages
 
 - [Home](https://oddevenbet.com/)
-- [Learn — how prediction markets work](https://oddevenbet.com/learn/)
-- [Prediction Markets — reviews & comparisons](https://oddevenbet.com/prediction-markets/)
-- [Major Sports — beginner guides](https://oddevenbet.com/major-sports/)
-- [Niche Sports — beginner guides](https://oddevenbet.com/niche-sports/)
-- [Reviews](https://oddevenbet.com/reviews/)
-- [How we research & score](https://oddevenbet.com/methodology/)
-- [Disclosure — who pays us](https://oddevenbet.com/disclosure/)
-- [Responsible gambling](https://oddevenbet.com/responsible-gambling/)
+- [The Essentials — how prediction markets work](https://oddevenbet.com/essentials)
+- [Sports Betting Glossary](https://oddevenbet.com/glossary)
+- [Prediction Markets — guides & first trades](https://oddevenbet.com/prediction-markets)
+- [Major Sports — beginner guides](https://oddevenbet.com/major-sports)
+- [Niche Sports — beginner guides](https://oddevenbet.com/niche-sports)
+- [Reviews — the platforms hub](https://oddevenbet.com/reviews)
+- [How we research & score](https://oddevenbet.com/methodology)
+- [Disclosure — who pays us](https://oddevenbet.com/disclosure)
+- [Responsible gambling](https://oddevenbet.com/responsible-gambling)
+
+## Other languages
+
+- [中文版](https://oddevenbet.com/zh)
+- [Versión en español](https://oddevenbet.com/es)
 
 ## Notes
 
 - English is the primary language; Chinese (/zh) and Spanish (/es) versions are available.
-- Some links are affiliate links; see the disclosure page for how that works.
+- The Essentials and Glossary pages carry no affiliate links — they are written to explain, not to sell.
+- Some links on review and comparison pages are affiliate links; see the disclosure page for how that works.
+- Full URL list: https://oddevenbet.com/sitemap-index.xml

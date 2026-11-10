@@ -1,5 +1,5 @@
 ---
-title: "NBA Basketball Betting Guide: Point Spread, Totals and Load Management"
+title: "NBA Betting: the Variable Nobody Checks Before Tip-Off"
 description: "The NBA has the densest schedule in sports, and back-to-backs plus load management are its biggest variables. Covers the spread, totals, moneyline and live betting."
 kind: "guide"
 summary: "The NBA's four markets (spread/totals/moneyline/live betting), and the two variables that decide games: back-to-backs and load management."

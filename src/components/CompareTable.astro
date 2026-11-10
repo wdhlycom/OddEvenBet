@@ -6,12 +6,12 @@ interface Props {
   rows: Row[]
   /** Highlights the winning column header. */
   winner?: 'left' | 'right'
-  /** Language for labels. Defaults to English; pass "zh" for Chinese. */
-  lang?: 'en' | 'zh'
+  /** Language for labels. Defaults to English; pass "zh" or "es". */
+  lang?: 'en' | 'zh' | 'es'
 }
 
 const { leftName, rightName, rows, winner, lang = 'en' } = Astro.props
-const attribute = lang === 'zh' ? '项目' : 'Attribute'
+const attribute = lang === 'zh' ? '项目' : lang === 'es' ? 'Atributo' : 'Attribute'
 ---
 
 <div class="table-scroll">

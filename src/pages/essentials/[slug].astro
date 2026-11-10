@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
 import ArticleLayout from '@/layouts/ArticleLayout.astro'
-import FAQ from '@/components/FAQ.astro'
 
 export async function getStaticPaths() {
   const entries = await getCollection('essentials', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en')
@@ -59,7 +58,7 @@ const schema = [
   schema={schema}
 >
   <div class="callout">
-    <strong>Short answer</strong>
+    <strong>TL;DR</strong>
     {d.answer}
   </div>
 
@@ -78,8 +77,4 @@ const schema = [
       </ul>
     </div>
   )}
-
-  <FAQ items={[
-    { q: d.question, a: d.answer },
-  ]} />
 </ArticleLayout>

@@ -1,5 +1,5 @@
 ---
-title: "Polymarket vs Kalshi: Which Should Beginners Choose"
+title: "Polymarket vs Kalshi: One Question Decides It"
 description: "Polymarket has the deepest book and no licence behind it; Kalshi has US regulation and a friendlier surface but a narrow menu. Match the platform to who you are."
 kind: "guide"
 summary: "Polymarket has depth but no regulatory backstop; Kalshi has CFTC regulation and a beginner-friendly surface but a narrow menu. Match them to your identity and needs."

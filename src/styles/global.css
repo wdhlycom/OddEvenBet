@@ -25,6 +25,8 @@
 
   --accent: #e8532f;          /* links / buttons on paper */
   --accent-ink: #ffffff;
+  --mark-bg: #cfe4f5;         /* <mark> highlight — light blue, distinct from the orange strong-highlight */
+  --mark-ink: #141412;
 
   --radius: 0px;              /* print: no rounded corners */
   --wrap: 1200px;
@@ -39,6 +41,8 @@
   --rule: #33302a;
   --accent: #fe7141;
   --accent-ink: #141412;
+  --mark-bg: #1d3a50;
+  --mark-ink: #eaf3fb;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -69,8 +73,8 @@ h1, h2, h3, h4 {
   margin: 0 0 0.5em;
   color: var(--ink);
 }
-h1 { font-size: clamp(1.9rem, 4vw, 2.9rem); }
-h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); margin-top: 1.6em; }
+h1 { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+h2 { font-size: clamp(1.35rem, 2.2vw, 1.65rem); margin-top: 1.6em; }
 h3 { font-size: 1.12rem; margin-top: 1.2em; line-height: 1.2; }
 
 p, ul, ol, blockquote { margin: 0 0 1.15em; }
@@ -208,7 +212,7 @@ hr::after {
 .display-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(1.95rem, 4.2vw, 3.1rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
   margin: 0 0 0.4em;
@@ -224,14 +228,80 @@ hr::after {
 }
 .standfirst strong { font-weight: 600; }
 
+/* Each hero claim is its own element (see index.astro), tied to the page that
+   evidences it. The dotted rule is deliberately faint: it reads as an
+   annotation, not as four blue links competing with the CTA. */
+.standfirst .claim {
+  text-decoration: underline dotted var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.standfirst .claim:hover { text-decoration-color: var(--accent); }
+.standfirst a.claim { color: var(--accent); }
+
 /* ---- interior page header (shared editorial masthead for inner pages) ---- */
 .page-masthead {
   background: var(--paper-warm);
   border-bottom: 1px solid var(--rule);
   padding: clamp(40px, 6vw, 80px) 0;
 }
+
+/* ---- Tab bar (Platforms hub: one switchable panel per nav section) ----
+   Three large display-font words, each in its own brand colour. No boxes:
+   inactive tabs are dimmed, the active one is fully saturated with a short
+   underline stroke — clearly switchable at a glance. Progressive
+   enhancement: panels only collapse when <html> has .js. */
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 34px;
+}
+.tab-bar [role='tab'] {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 2px 0 6px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  opacity: 0.38;
+  border-bottom: 4px solid transparent;
+  transition: opacity 0.15s ease;
+}
+.tab-bar [role='tab']:hover { opacity: 0.75; }
+.tab-bar [role='tab'].is-active {
+  opacity: 1;
+  border-bottom-color: currentColor;
+}
+/* One colour per section, reused for the section eyebrow accents. */
+.tab--prediction-markets { color: #fe7141; } /* orange — prediction markets */
+.tab--niche-sports       { color: #7d9b76; } /* sage   — niche sports     */
+.tab--major-sports       { color: #4d7ea8; } /* steel blue — major sports */
+.js .tab-panel { display: none; }
+.js .tab-panel.is-active { display: block; }
+.tab-panel { margin-top: 28px; }
+
+/* Whole platform score-card clickable: the title link stretches over the
+   card; the affiliate CTA sits above the overlay and stays independently
+   clickable. */
+.pcard { position: relative; }
+.pcard .pcard-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.pcard .cta {
+  position: relative;
+  z-index: 2;
+}
+/* Anchor targets inside the hub panels need clearance for the sticky header. */
+.plat-group { scroll-margin-top: 90px; }
 .page-masthead h1 {
-  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   max-width: 22ch;
   margin: 0 0 0.35em;
 }
@@ -343,17 +413,112 @@ th, td { text-align: left; padding: 12px 14px; border-bottom: 1.5px solid var(--
 th { background: var(--ink); color: var(--paper); font-family: var(--font-display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
 td:first-child { font-weight: 600; }
 
-/* ---- article body ---- */
-.prose h2 { padding-top: 0.2em; }
-blockquote {
-  margin: 1.6em 0;
-  padding: 16px 20px;
-  border: 1.5px dashed var(--ink-soft);
-  border-radius: 12px;
-  color: var(--ink-soft);
-  font-style: italic;
-  background: transparent;
+/* ---- article body ----
+   A long read needs three levels of emphasis, not one:
+   strong = the key claim in a sentence (soft highlighter)
+   em     = a term or a turn in the argument (italic + accent)
+   mark   = a number or claim a skimmer must not miss (solid acid block)
+   Headings, lists and quotes get their own visual signature so a reader can
+   scan the structure before reading a word. */
+.prose {
+  font-size: 1.02rem;
+  line-height: 1.68;
 }
+.prose > p,
+.prose > ul,
+.prose > ol { margin-bottom: 1.25em; }
+
+.prose strong {
+  font-weight: 700;
+  color: var(--accent);
+  background: linear-gradient(180deg, transparent 55%, rgba(254, 113, 65, 0.18) 55%);
+  padding: 0 0.06em;
+}
+.prose em { font-style: italic; color: var(--accent); }
+.prose mark {
+  background: var(--mark-bg);
+  color: var(--mark-ink);
+  padding: 0.05em 0.3em;
+  font-weight: 600;
+}
+.prose a { color: var(--accent); }
+.prose a:hover { background: var(--acid); color: #141412; }
+
+/* h2 gets breathing room only — no rule line across the page; the reader
+   already has enough section furniture from the orange square marker. */
+.prose h2 {
+  margin-top: 2.4em;
+  padding-top: 0;
+  font-size: clamp(1.28rem, 2vw, 1.5rem);
+  letter-spacing: -0.015em;
+}
+.prose h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: 0.45em;
+  background: var(--accent);
+  vertical-align: 0.06em;
+}
+.prose h3 {
+  margin-top: 1.9em;
+  padding-left: 12px;
+  border-left: 4px solid var(--accent);
+  font-size: 1.1rem;
+}
+.prose h4 {
+  margin-top: 1.6em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.prose ul > li::marker { content: "▪  "; color: var(--accent); }
+.prose ol > li::marker { color: var(--accent); font-family: var(--font-display); font-weight: 700; }
+.prose li { margin-bottom: 0.5em; }
+
+.prose blockquote {
+  position: relative;
+  margin: 2em 0;
+  padding: 22px 26px 22px 30px;
+  border: 0;
+  border-left: 5px solid var(--accent);
+  background: var(--paper-warm);
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-style: italic;
+  line-height: 1.6;
+}
+.prose blockquote::before {
+  content: "“";
+  position: absolute;
+  left: 8px;
+  top: -4px;
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.28;
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+/* Component furniture that lives inside .prose must keep its own look. */
+.prose .card h3 {
+  margin-top: 0;
+  padding-left: 0;
+  border-left: 0;
+  font-size: 1.3rem;
+}
+.prose .card strong,
+.prose .callout strong {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
 .prose code {
   background: var(--paper-warm); padding: 0.15em 0.4em; border-radius: 2px;
   font-size: 0.88em; border: 1px solid var(--rule);

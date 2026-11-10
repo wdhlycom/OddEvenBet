@@ -1,66 +1,166 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { bySlug } from '@/data/platforms'
+import { bySlug, ranked } from '@/data/platforms'
 
-const collections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
-const all = await Promise.all(
-  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review' && (data.lang ?? 'en') === 'en')),
-)
-const entries = all
-  .flat()
-  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+/**
+ * The platform hub. Three switchable panels matching the nav sections, so the
+ * page stays short as content grows. Every review / compare / best page lives
+ * HERE under /reviews/... (the `reviews` content collection). Within each
+ * panel, articles are grouped by platform with an anchor (#platform-<slug>)
+ * — that anchor is where score cards across the site deep-link to.
+ */
+const tabs = [
+  { key: 'prediction-markets', label: 'Prediction Markets', cls: 'tab--prediction-markets' },
+  { key: 'niche-sports', label: 'Niche Sports', cls: 'tab--niche-sports' },
+  { key: 'major-sports', label: 'Major Sports', cls: 'tab--major-sports' },
+] as const
 
-const hrefFor = (e: { id: string; collection: string }) =>
-  `/${e.collection}/${e.id}`
+type TabKey = (typeof tabs)[number]['key']
+const platformType: Record<TabKey, 'prediction-market' | 'sportsbook'> = {
+  'prediction-markets': 'prediction-market',
+  'niche-sports': 'sportsbook',
+  'major-sports': 'sportsbook',
+}
 
-const groups = [
-  { type: 'prediction-market' as const, label: 'Prediction markets' },
-  { type: 'sportsbook' as const, label: 'Sportsbooks' },
-]
+const entries = (await getCollection('reviews', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const kindLabel: Record<string, string> = { review: 'Review', compare: 'Comparison', best: 'Best list' }
+const dateLabel = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+
+/** Per-panel view model: best lists on top, then one anchor group per platform. */
+const panel = (key: TabKey) => {
+  const items = entries.filter((e) => e.data.section === key)
+  const bests = items.filter((e) => e.data.kind === 'best')
+  // Reviews group under their subject; comparisons appear under BOTH sides so
+  // every mentioned platform has its own #platform-<slug> anchor group.
+  const byPlatform = new Map<string, typeof items>()
+  for (const e of items) {
+    const slugs = e.data.kind === 'review'
+      ? [e.data.platformSlug]
+      : e.data.kind === 'compare'
+        ? [e.data.left, e.data.right]
+        : []
+    for (const slug of slugs) {
+      if (!byPlatform.has(slug)) byPlatform.set(slug, [])
+      byPlatform.get(slug)!.push(e)
+    }
+  }
+  const groups = ranked(platformType[key])
+    .filter((p) => byPlatform.has(p.slug))
+    .map((p) => ({ platform: p, items: byPlatform.get(p.slug)! }))
+  return { bests, groups }
+}
 ---
 
 <BaseLayout
-  title="Reviews: prediction markets and sportsbooks"
-  description="Full reviews of prediction markets and licensed sportsbooks. Each one lists fees, payout terms, licensing and the parts we could not verify — plus who should stay away."
+  title="Platforms: reviews, comparisons and ranked lists"
+  description="Every platform review, side-by-side comparison and ranked list, grouped by section and by platform. Score cards across the site deep-link here."
   path="/reviews"
 >
   <section class="page-masthead">
     <div class="wrap">
-      <span class="eyebrow">Reviews</span>
-      <h1>Every review, with the downside stated</h1>
+      <span class="eyebrow">Platforms</span>
+      <h1>Reviews, comparisons and ranked lists</h1>
       <p class="lede">
-        A review that lists no drawbacks is an advertisement. We score against a fixed rubric
-        and publish the score breakdown so you can disagree with it specifically.
+        Everything we have published about the platforms, grouped by section and by
+        platform. Scores come from the six weighted dimensions in our
+        <a href="/methodology">methodology</a>.
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
-    {groups.map((g) => {
-      const items = entries.filter((e) => bySlug(e.data.platformSlug)?.type === g.type)
-      if (!items.length) return null
+    <!--
+      Three parallel panels, one per nav section. Without JavaScript all panels
+      render stacked (progressive enhancement: hiding non-active panels only
+      applies under .js, set before first paint in BaseLayout).
+    -->
+    <div class="tab-bar" role="tablist" aria-label="Platform sections" style="margin-top:36px;">
+      {tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${tab.key}`}
+          class:list={[tab.cls, { 'is-active': i === 0 }]}
+          aria-controls={`panel-${tab.key}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {tabs.map((tab, i) => {
+      const { bests, groups } = panel(tab.key)
       return (
-        <div style="margin-top:40px;">
-          <h2>{g.label}</h2>
-          <div class="grid">
-            {items.map((e) => (
-              <article class="card card-link">
-                <span class="meta">Updated {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
-                <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
-                <p>{e.data.verdict}</p>
-                <div class="small muted" style="font-size:.82rem;">
-                  <div><strong>Best for:</strong> {e.data.bestFor}</div>
-                </div>
-              </article>
-            ))}
-          </div>
+        <div
+          role="tabpanel"
+          id={`panel-${tab.key}`}
+          aria-labelledby={`tab-${tab.key}`}
+          class:list={['tab-panel', { 'is-active': i === 0 }]}
+        >
+          {bests.length > 0 && (
+            <div class="grid" style="margin-bottom:8px;">
+              {bests.map((e) => (
+                <article class="card card-link">
+                  <span class="meta">{kindLabel[e.data.kind]} · {dateLabel(e.data.updated)}</span>
+                  <h3><a href={`/reviews/${e.id}`}>{e.data.title}</a></h3>
+                  <p>{e.data.summary}</p>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {groups.map(({ platform, items }) => (
+            <div class="plat-group" id={`platform-${platform.slug}`} style="margin-top:36px;">
+              <p class="eyebrow" style="margin-bottom:10px;">{platform.name}</p>
+              <div class="grid">
+                {items.map((e) => (
+                  <article class="card card-link">
+                    <span class="meta">{kindLabel[e.data.kind] ?? e.data.kind} · {dateLabel(e.data.updated)}</span>
+                    <h3><a href={`/reviews/${e.id}`}>{e.data.title}</a></h3>
+                    <p>{e.data.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {bests.length === 0 && groups.length === 0 && (
+            <p class="muted">Platform reviews for this section are being written.</p>
+          )}
         </div>
       )
     })}
-
-    {entries.length === 0 && (
-      <p class="muted">No reviews published yet.</p>
-    )}
   </section>
+
+  <script>
+    // Tab switching: one panel visible at a time. No framework needed — the
+    // panels are plain DOM, and without JS everything stays visible stacked.
+    // Deep links: /reviews#platform-<slug> opens the right panel, then scrolls
+    // to that platform's group (used by score cards across the site).
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.tab-bar [role="tab"]')
+    const activate = (tab: Element) => {
+      tabs.forEach((t) => {
+        t.classList.remove('is-active')
+        t.setAttribute('aria-selected', 'false')
+      })
+      tab.classList.add('is-active')
+      tab.setAttribute('aria-selected', 'true')
+      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('is-active'))
+      document.getElementById(tab.getAttribute('aria-controls') ?? '')?.classList.add('is-active')
+    }
+    tabs.forEach((tab) => tab.addEventListener('click', () => activate(tab)))
+
+    const target = location.hash ? document.getElementById(location.hash.slice(1)) : null
+    if (target) {
+      const panelEl = target.closest('.tab-panel')
+      const ownerId = panelEl?.getAttribute('aria-labelledby')
+      const owner = ownerId ? document.getElementById(ownerId) : null
+      if (owner && !owner.classList.contains('is-active')) activate(owner)
+      target.scrollIntoView({ block: 'start' })
+    }
+  </script>
 </BaseLayout>

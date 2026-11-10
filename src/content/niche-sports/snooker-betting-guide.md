@@ -1,5 +1,5 @@
 ---
-title: "Snooker Betting Guide: For People Willing to Do the Work"
+title: "Snooker Betting: the Format Decides Who Can Upset"
 description: "Snooker is relatively transparent and slow-paced—ideal for people willing to do the work. The three core markets and why longer formats have fewer upsets."
 kind: "guide"
 summary: "Snooker's three core markets (handicap, highest break, total centuries), and the rule that long formats see fewer upsets than short ones."

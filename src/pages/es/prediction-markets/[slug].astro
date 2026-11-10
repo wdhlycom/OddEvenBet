@@ -1,0 +1,70 @@
+---
+import { getCollection, render } from 'astro:content'
+import ArticleLayout from '@/layouts/ArticleLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('prediction-markets', ({ data }) => !data.draft && data.lang === 'es')
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^es\//, '') },
+    props: { entry },
+  }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const d = entry.data
+const path = `/es/prediction-markets/${entry.id.replace(/^es\//, '')}`
+
+const levelLabel = { beginner: 'principiante', intermediate: 'intermedio', advanced: 'avanzado' }[d.level] ?? d.level
+const linked = (d.platforms ?? []).map(bySlug).filter(Boolean)
+
+const schema = [{
+  '@type': 'Article',
+  headline: d.title,
+  description: d.description,
+  dateModified: d.updated.toISOString(),
+  author: { '@type': 'Person', name: d.author },
+  mainEntityOfPage: `https://oddevenbet.com${path}`,
+  inLanguage: 'es',
+}]
+---
+
+<ArticleLayout
+  title={d.title}
+  heading={d.title}
+  description={d.description}
+  path={path}
+  section="Mercados de predicción"
+  sectionHref="/es/prediction-markets"
+  updated={d.updated}
+  author={d.author}
+  schema={schema}
+>
+  {d.kind === 'guide' && (
+    <>
+      <p class="muted small">Para {d.audience} · nivel {levelLabel}</p>
+
+      {d.steps.length > 0 && (
+        <>
+          <h2>Qué cubre esta página</h2>
+          <ol>{d.steps.map((s) => <li>{s}</li>)}</ol>
+        </>
+      )}
+
+      <Content />
+
+      {linked.length > 0 && (
+        <>
+          <h2>Plataformas mencionadas</h2>
+          <div class="grid">
+            {linked.map((p) => p && <PlatformCard platform={p} lang="es" href={`/es/reviews#platform-${p.slug}`} />)}
+          </div>
+        </>
+      )}
+    </>
+  )}
+
+  {d.kind === 'explainer' && <Content />}
+</ArticleLayout>

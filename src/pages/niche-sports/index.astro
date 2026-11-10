@@ -1,14 +1,27 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
 
+// Division of labour: sport guides stay here; platform reviews and comparisons
+// live in the Platforms hub (/reviews). Niche sports lean on crypto books, so
+// the brief profiles below are the crypto-native ones.
 const entries = (await getCollection('niche-sports', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
-  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const guides = entries.filter((e) => e.data.kind === 'guide')
+
+// Crypto-native books that carry the niche-sport markets. Slugs mirror
+// platforms.ts; licensed fiat books live in the major-sports section. Each
+// card deep-links to the platform's own group on the Platforms hub.
+const platformSlugs = ['stake', 'bcgame']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
 ---
 
 <BaseLayout
   title="Niche sports betting: esports, darts, snooker and more"
-  description="Guides and platform picks for niche sports betting — esports, darts, snooker, tennis and other markets the big comparison sites skip."
+  description="Guides for betting on esports, darts, snooker, tennis and other niche markets. Brief platform profiles here; full reviews and comparisons in the Platforms hub."
   path="/niche-sports"
 >
   <section class="page-masthead">
@@ -17,27 +30,39 @@ const entries = (await getCollection('niche-sports', ({ data }) => !data.draft &
       <h1>The markets the big sites skip</h1>
       <p class="lede">
         Esports, darts, snooker and the smaller leagues are where a specialist can still
-        out-rank the giants. We cover the betting markets and platforms here in depth.
+        out-rank the giants. Learn each sport's markets first, then see which platforms
+        carry them.
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
-    {entries.length > 0 ? (
-      <div class="grid">
-        {entries.map((e) => (
-          <article class="card card-link">
-            <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
-            <h3><a href={`/niche-sports/${e.id}`}>{e.data.title}</a></h3>
-            <p>{e.data.summary}</p>
-          </article>
-        ))}
+    {guides.length > 0 && (
+      <div style="margin-top:32px;">
+        <h2>Understand the sport first</h2>
+        <div class="grid">
+          {guides.map((e) => (
+            <article class="card card-link">
+              <span class="meta">Guide · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/niche-sports/${e.id}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
       </div>
-    ) : (
-      <p class="muted">
-        Content for this section is being written. We're starting with esports, darts and
-        snooker guides — check back soon.
-      </p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>Where these markets live, briefly</h2>
+        <p class="muted" style="max-width:52ch;">
+          One-line profiles here. Detailed reviews and comparisons are in the
+          <a href="/reviews">Platforms hub</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} href={`/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
     )}
   </section>
 </BaseLayout>

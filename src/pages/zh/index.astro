@@ -5,12 +5,8 @@ import PlatformCard from '@/components/PlatformCard.astro'
 import { site } from '@/data/site'
 import { ranked } from '@/data/platforms'
 
-const topicCollections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
-
-const reviews = (await Promise.all(
-  topicCollections.map((c) => getCollection(c, ({ data }) => !data.draft && data.kind === 'review' && data.lang === 'zh')),
-))
-  .flat()
+// 评测文章住在 reviews 合集，渲染在 /zh/reviews/...
+const reviews = (await getCollection('reviews', ({ data }) => !data.draft && data.kind === 'review' && data.lang === 'zh'))
   .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
   .slice(0, 3)
 
@@ -20,8 +16,8 @@ const learn = (await getCollection('essentials', ({ data }) => !data.draft && da
 
 const top = ranked().slice(0, 3)
 
-const reviewPathFor = (e: { id: string; collection: string }) =>
-  `/zh/${e.collection}/${e.id}`
+const reviewPathFor = (e: { id: string }) =>
+  `/zh/reviews/${e.id.replace(/^zh\//, '')}`
 
 const schema = [
   {
@@ -101,17 +97,14 @@ const schema = [
       按我们<a href="/zh/methodology">评分方法</a>里的加权分排序，费用与流动性权重最高。
     </p>
     <div class="grid" style="margin-top:28px;">
-      {top.map((p, i) => {
-        const review = reviews.find((r) => r.data.platformSlug === p.slug)
-        return (
-          <PlatformCard
-            platform={p}
-            rank={i + 1}
-            reviewSlug={review ? reviewPathFor(review) : undefined}
-            lang="zh"
-          />
-        )
-      })}
+      {top.map((p, i) => (
+        <PlatformCard
+          platform={p}
+          rank={i + 1}
+          href={`/zh/reviews#platform-${p.slug}`}
+          lang="zh"
+        />
+      ))}
     </div>
   </section>
 

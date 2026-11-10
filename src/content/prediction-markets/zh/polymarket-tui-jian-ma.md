@@ -1,5 +1,5 @@
 ---
-title: "Polymarket 有推荐码吗？优惠和返现的真相"
+title: "Polymarket 推荐码：所谓免费钱的真相"
 description: "很多人搜 Polymarket 推荐码、优惠码，想省点手续费或拿注册奖励。这篇说清楚：Polymarket 到底有没有官方优惠，那些'注册送 XX'的码是真是假，以及真正能省钱的地方在哪。"
 kind: "guide"
 summary: "Polymarket 没有传统意义上的注册奖励和优惠码；它省钱的地方在手续费结构（挂单免费、返现计划），而不是注册送钱。那些'送 XX 美元'的码多是引流话术。"
@@ -66,4 +66,4 @@ Polymarket 不一样：它不跟你对赌，只是撮合你和别的交易者，
 
 ---
 
-**相关：**[Polymarket 2026 评测：最深的订单簿，最薄的安全网](/zh/prediction-markets/polymarket-review-2026)
+**相关：**[Polymarket 2026 评测：最深的订单簿，最薄的安全网](/zh/reviews/polymarket-review-2026)

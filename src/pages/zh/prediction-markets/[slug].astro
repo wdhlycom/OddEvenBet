@@ -76,12 +76,13 @@ if (d.kind === 'best') {
 
 if (d.kind === 'guide') {
   linked = d.platforms.map(bySlug).filter(Boolean)
+  // HowTo rich results were retired by Google in 2023-09. Guides are articles;
+  // the steps remain visible in the body, just not as structured data.
   schema = [{
-    '@type': 'HowTo',
-    name: d.title,
+    '@type': 'Article',
+    headline: d.title,
     description: d.description,
     dateModified: d.updated.toISOString(),
-    step: d.steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, text: s })),
   }]
 }
 ---

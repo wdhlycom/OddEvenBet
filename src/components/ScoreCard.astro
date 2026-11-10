@@ -10,8 +10,8 @@ interface Props {
   scores: Record<ScoreKey, number>
   /** Optional overall override; otherwise computed as the weighted average. */
   overall?: number
-  /** Language for labels. Defaults to English; pass "zh" for Chinese labels. */
-  lang?: 'en' | 'zh'
+  /** Language for labels. Defaults to English; pass "zh" or "es". */
+  lang?: 'en' | 'zh' | 'es'
 }
 
 const { scores, overall, lang = 'en' } = Astro.props
@@ -32,7 +32,15 @@ const labels = {
     rubric: '公开的评分标准',
     noPay: '我们不为评分收受任何报酬。',
   },
+  es: {
+    outOf: '/ 10 puntuación ponderada',
+    follows: 'Las puntuaciones siguen nuestra',
+    rubric: 'rúbrica publicada',
+    noPay: 'No aceptamos pagos por una puntuación.',
+  },
 }[lang]
+
+const methodologyHref = lang === 'zh' ? '/zh/methodology' : lang === 'es' ? '/es/methodology' : '/methodology'
 
 const dimLabels: Record<ScoreKey, string> = lang === 'zh'
   ? {
@@ -43,7 +51,16 @@ const dimLabels: Record<ScoreKey, string> = lang === 'zh'
       payout: '出金速度与方式',
       support: '客服与争议处理',
     }
-  : Object.fromEntries(scoreDimensions.map((d) => [d.key, d.label])) as Record<ScoreKey, string>
+  : lang === 'es'
+    ? {
+        fees: 'Comisiones y estructura de pago',
+        liquidity: 'Profundidad y liquidez del mercado',
+        usability: 'Usabilidad',
+        trust: 'Licencia y seguridad de los fondos',
+        payout: 'Velocidad y métodos de pago',
+        support: 'Soporte y resolución de disputas',
+      }
+    : Object.fromEntries(scoreDimensions.map((d) => [d.key, d.label])) as Record<ScoreKey, string>
 ---
 
 <div style="border:1px solid var(--rule); border-radius:var(--radius); padding:20px; margin:1.6em 0;">
@@ -65,6 +82,6 @@ const dimLabels: Record<ScoreKey, string> = lang === 'zh'
   </div>
 
   <p class="small muted" style="margin:14px 0 0;">
-    {labels.follows} <a href="/methodology">{labels.rubric}</a>. {labels.noPay}
+    {labels.follows} <a href={methodologyHref}>{labels.rubric}</a>. {labels.noPay}
   </p>
 </div>

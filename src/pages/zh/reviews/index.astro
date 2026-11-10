@@ -1,66 +1,160 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { bySlug } from '@/data/platforms'
+import { bySlug, ranked } from '@/data/platforms'
 
-const collections = ['prediction-markets', 'niche-sports', 'major-sports'] as const
-const all = await Promise.all(
-  collections.map((c) => getCollection(c, ({ data }) => !data.draft && data.lang === 'zh' && data.kind === 'review')),
-)
-const entries = all
-  .flat()
-  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+/**
+ * 平台库（中文版）。三个可切换面板，与导航板块一一对应，内容再多页面也不变长。
+ * 全部评测/对比/榜单都住在 reviews 合集，渲染在 /zh/reviews/...。
+ * 面板内按平台分组并带锚点（#platform-<slug>），全站评分卡深链到这里。
+ */
+const tabs = [
+  { key: 'prediction-markets', label: '预测市场', cls: 'tab--prediction-markets' },
+  { key: 'niche-sports', label: '冷门运动', cls: 'tab--niche-sports' },
+  { key: 'major-sports', label: '热门运动', cls: 'tab--major-sports' },
+] as const
 
-const hrefFor = (e: { id: string; collection: string }) =>
-  `/zh/${e.collection}/${e.id}`
+type TabKey = (typeof tabs)[number]['key']
+const platformType: Record<TabKey, 'prediction-market' | 'sportsbook'> = {
+  'prediction-markets': 'prediction-market',
+  'niche-sports': 'sportsbook',
+  'major-sports': 'sportsbook',
+}
 
-const groups = [
-  { type: 'prediction-market' as const, label: '预测市场' },
-  { type: 'sportsbook' as const, label: '体育博彩平台' },
-]
+const entries = (await getCollection('reviews', ({ data }) => !data.draft && data.lang === 'zh'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const kindLabel: Record<string, string> = { review: '评测', compare: '对比', best: '榜单' }
+const dateLabel = (d: Date) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })
+const hrefFor = (e: { id: string }) => `/zh/reviews/${e.id.replace(/^zh\//, '')}`
+
+/** 面板视图模型：榜单置顶，其余按平台分组。对比文挂在两侧平台下，保证每个被提到的平台都有自己的锚点分组。 */
+const panel = (key: TabKey) => {
+  const items = entries.filter((e) => e.data.section === key)
+  const bests = items.filter((e) => e.data.kind === 'best')
+  const byPlatform = new Map<string, typeof items>()
+  for (const e of items) {
+    const slugs = e.data.kind === 'review'
+      ? [e.data.platformSlug]
+      : e.data.kind === 'compare'
+        ? [e.data.left, e.data.right]
+        : []
+    for (const slug of slugs) {
+      if (!byPlatform.has(slug)) byPlatform.set(slug, [])
+      byPlatform.get(slug)!.push(e)
+    }
+  }
+  const groups = ranked(platformType[key])
+    .filter((p) => byPlatform.has(p.slug))
+    .map((p) => ({ platform: p, items: byPlatform.get(p.slug)! }))
+  return { bests, groups }
+}
 ---
 
 <BaseLayout
-  title="平台评测：预测市场和体育博彩（中文）"
-  description="预测市场和持牌体育博彩平台的完整评测。每一篇都列出费用、提款条款、牌照，以及我们没法核实的地方。"
+  title="平台库：评测、对比与榜单（中文）"
+  description="全部平台评测、对比与榜单，按板块和平台分组。全站评分卡都深链到这里。"
   path="/zh/reviews"
   lang="zh"
 >
   <section class="page-masthead">
     <div class="wrap">
-      <span class="eyebrow">评测</span>
-      <h1>每一篇评测，都把缺点讲清楚</h1>
+      <span class="eyebrow">平台库</span>
+      <h1>评测、对比与榜单</h1>
       <p class="lede">
-        不列缺点的评测就是广告。我们按一套固定的标准打分，并公开每一项的分数，让你可以具体地反对它。
+        关于平台的一切详细内容，按板块和平台分组。分数来自<a href="/zh/methodology">评分方法</a>里六个加权的维度。
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
-    {groups.map((g) => {
-      const items = entries.filter((e) => bySlug(e.data.platformSlug)?.type === g.type)
-      if (!items.length) return null
+    <!--
+      三个并列面板，对应三个导航板块。无 JavaScript 时所有面板纵向堆叠
+      （渐进增强：只在 .js 下隐藏非激活面板，.js 在 BaseLayout 首屏前设置）。
+    -->
+    <div class="tab-bar" role="tablist" aria-label="平台板块" style="margin-top:36px;">
+      {tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${tab.key}`}
+          class:list={[tab.cls, { 'is-active': i === 0 }]}
+          aria-controls={`panel-${tab.key}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {tabs.map((tab, i) => {
+      const { bests, groups } = panel(tab.key)
       return (
-        <div style="margin-top:40px;">
-          <h2>{g.label}</h2>
-          <div class="grid">
-            {items.map((e) => (
-              <article class="card card-link">
-                <span class="meta">更新于 {e.data.updated.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
-                <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
-                <p>{e.data.verdict}</p>
-                <div class="small muted" style="font-size:.82rem;">
-                  <div><strong>最适合：</strong> {e.data.bestFor}</div>
-                </div>
-              </article>
-            ))}
-          </div>
+        <div
+          role="tabpanel"
+          id={`panel-${tab.key}`}
+          aria-labelledby={`tab-${tab.key}`}
+          class:list={['tab-panel', { 'is-active': i === 0 }]}
+        >
+          {bests.length > 0 && (
+            <div class="grid" style="margin-bottom:8px;">
+              {bests.map((e) => (
+                <article class="card card-link">
+                  <span class="meta">{kindLabel[e.data.kind]} · {dateLabel(e.data.updated)}</span>
+                  <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
+                  <p>{e.data.summary}</p>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {groups.map(({ platform, items }) => (
+            <div class="plat-group" id={`platform-${platform.slug}`} style="margin-top:36px;">
+              <p class="eyebrow" style="margin-bottom:10px;">{platform.name}</p>
+              <div class="grid">
+                {items.map((e) => (
+                  <article class="card card-link">
+                    <span class="meta">{kindLabel[e.data.kind] ?? e.data.kind} · {dateLabel(e.data.updated)}</span>
+                    <h3><a href={hrefFor(e)}>{e.data.title}</a></h3>
+                    <p>{e.data.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {bests.length === 0 && groups.length === 0 && (
+            <p class="muted">这个板块的平台评测正在撰写中。</p>
+          )}
         </div>
       )
     })}
-
-    {entries.length === 0 && (
-      <p class="muted">评测内容正在逐步撰写中，敬请期待。</p>
-    )}
   </section>
+
+  <script>
+    // 标签切换：一次只显示一个面板。无 JS 时全部面板堆叠可见。
+    // 深链：/zh/reviews#platform-<slug> 会先切到对应面板，再滚动到该平台分组
+    // （全站评分卡都用这种链接）。
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.tab-bar [role="tab"]')
+    const activate = (tab: Element) => {
+      tabs.forEach((t) => {
+        t.classList.remove('is-active')
+        t.setAttribute('aria-selected', 'false')
+      })
+      tab.classList.add('is-active')
+      tab.setAttribute('aria-selected', 'true')
+      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('is-active'))
+      document.getElementById(tab.getAttribute('aria-controls') ?? '')?.classList.add('is-active')
+    }
+    tabs.forEach((tab) => tab.addEventListener('click', () => activate(tab)))
+
+    const target = location.hash ? document.getElementById(location.hash.slice(1)) : null
+    if (target) {
+      const panelEl = target.closest('.tab-panel')
+      const ownerId = panelEl?.getAttribute('aria-labelledby')
+      const owner = ownerId ? document.getElementById(ownerId) : null
+      if (owner && !owner.classList.contains('is-active')) activate(owner)
+      target.scrollIntoView({ block: 'start' })
+    }
+  </script>
 </BaseLayout>

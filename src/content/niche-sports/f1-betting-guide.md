@@ -1,5 +1,5 @@
 ---
-title: "F1 Betting Guide: Drivers, Constructors and the Two Core Markets"
+title: "F1 Betting: It Is the Car, Not the Driver"
 description: "F1's betting markets have no spreads—you bet finishing positions and qualifying. How the format, top teams and the two core F1 markets work."
 kind: "guide"
 summary: "F1's format, top teams (Mercedes/Ferrari/Red Bull/McLaren), and the two core markets: driver bets and constructor bets."

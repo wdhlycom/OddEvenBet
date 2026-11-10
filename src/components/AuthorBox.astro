@@ -1,21 +1,55 @@
 ---
-import { site } from '@/data/site'
+import { site, locales } from '@/data/site'
 
 interface Props { name: string; role?: string }
 
-const { name, role = 'Researcher & Editor' } = Astro.props
+const { name, role } = Astro.props
 const initials = name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+
+// Language comes from the URL prefix (en has none), same rule as ArticleLayout.
+const path = Astro.url.pathname
+const activeLocale =
+  locales.find((l) => l.prefix && (path === l.prefix || path.startsWith(l.prefix + '/'))) ??
+  locales[0]
+const lang = activeLocale.code as 'en' | 'zh' | 'es'
+const methodologyHref = activeLocale.prefix + '/methodology'
+
+/**
+ * Bio copy follows the reader's language. Names stay as authored in
+ * frontmatter ("Editorial Team" / "编辑部" / "Equipo editorial").
+ */
+const t = {
+  en: {
+    role: 'Researcher & Editor',
+    bio:
+      'Writes about prediction markets and licensed sportsbooks. Every review states what was checked, when, and what we could not verify.',
+    link: 'Read the methodology',
+  },
+  zh: {
+    role: '研究员与编辑',
+    bio:
+      '撰写预测市场与持牌博彩平台的评测。每篇评测都会说明查了什么、什么时候查的、哪些我们没能核实。',
+    link: '了解我们的研究方法',
+  },
+  es: {
+    role: 'Investigador y editor',
+    bio:
+      'Escribimos sobre mercados de predicción y casas de apuestas con licencia. Cada reseña indica qué comprobamos, cuándo y qué no pudimos verificar.',
+    link: 'Leer la metodología',
+  },
+}[lang]
+
+const roleLabel = role ?? t.role
 ---
 
 <div class="author-box">
   <div class="avatar" aria-hidden="true">{initials}</div>
   <div>
     <strong style="color: var(--ink); display:block;">{name}</strong>
-    <span style="font-size:.82rem;">{role}, {site.name}</span>
+    <span style="font-size:.82rem;">{roleLabel}, {site.name}</span>
     <p style="margin:8px 0 0;">
-      Writes about prediction markets and licensed sportsbooks. Every review
-      states what was checked, when, and what we could not verify.
-      <a href="/methodology">Read the methodology</a>.
+      {t.bio}
+      <a href={methodologyHref}>{t.link}</a>{lang === 'zh' ? '。' : '.'}
     </p>
   </div>
 </div>

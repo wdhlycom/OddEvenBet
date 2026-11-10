@@ -1,5 +1,5 @@
 ---
-title: "NHL Hockey Betting Guide: How the Season Works, the Real Contenders, and One Ignored Variable"
+title: "NHL Betting: the Ignored Variable Is Standing in Net"
 description: "NHL is one of North America's biggest betting markets, yet the most overlooked. This covers the season's rhythm, contenders, core markets and the goaltender variable."
 kind: "guide"
 summary: "The NHL season's rhythm, five genuine contenders, three core markets (spread/totals/moneyline), and the two variables that decide games: goaltenders and back-to-backs."

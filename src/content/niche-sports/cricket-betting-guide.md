@@ -1,5 +1,5 @@
 ---
-title: "Cricket Betting Guide: Handicaps, Totals and an Underrated Market"
+title: "Cricket Betting: the Market Nobody Prices Right"
 description: "Cricket is the world's second-biggest betting market, led by India. How T20, ODI and Test differ, plus cricket's handicap and totals markets."
 kind: "guide"
 summary: "Cricket's three formats (T20/ODI/Test) and its core markets (handicap, totals), plus India, the huge market most people underrate."

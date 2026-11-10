@@ -1,5 +1,5 @@
 ---
-title: "NFL Betting Guide: Point Spread, Totals and the Injury Report"
+title: "NFL Betting: the Report That Moves the Line Every Week"
 description: "NFL data is the most transparent in sports, so your edge only comes from digging deeper. This explains the spread, totals, moneyline and the injury report."
 kind: "guide"
 summary: "NFL's three core markets (spread/totals/moneyline), and the three variables that decide games: the injury report, home field and weather."

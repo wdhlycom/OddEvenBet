@@ -1,5 +1,5 @@
 ---
-title: "Is Polymarket Legal in the US? State by State"
+title: "Is Polymarket Legal? Why \"It Depends\" Is the Honest Answer"
 description: "Polymarket's legality is layered: an offshore crypto platform plus a US-regulated entry. Its CFTC history, state-by-state access, and things to check before you fund."
 kind: "guide"
 summary: "Polymarket's compliance identity, its CFTC settlement history, which US states are restricted, and why “is it legal” must be answered per region and per platform entity."

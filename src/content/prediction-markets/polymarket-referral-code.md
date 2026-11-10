@@ -1,5 +1,5 @@
 ---
-title: "Does Polymarket Have a Referral Code? The Truth on Promos and Cashback"
+title: "Polymarket Referral Code: the Truth About \"Free Money\""
 description: "Polymarket has no traditional sign-up bonus or promo code. The real savings are the fee structure — maker trades are free, plus a rebate program."
 kind: "guide"
 summary: "Polymarket has no traditional sign-up rewards or promo codes. Its savings live in the fee structure (fee-free makers, a rebate program), not in sign-up payouts. Codes promising “free $XX” are mostly lead-gen."
@@ -65,4 +65,4 @@ The test is simple: **Polymarket has never put a "enter promo code" entry on its
 
 ---
 
-**Related:** [Polymarket Review 2026: Deepest Book, Weakest Safety Net](/prediction-markets/polymarket-review-2026)
+**Related:** [Polymarket Review 2026: Deepest Book, Weakest Safety Net](/reviews/polymarket-review-2026)

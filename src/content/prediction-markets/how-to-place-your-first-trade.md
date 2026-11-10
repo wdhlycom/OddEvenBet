@@ -1,5 +1,5 @@
 ---
-title: "How to Place Your First Prediction-Market Trade"
+title: "Your First Prediction Trade: the Step You Cannot Skip"
 description: "Your first trade should cost $5–10, not real money on a direction. Walk the whole flow first: open, fund, read the resolution rule, trade, withdraw."
 kind: "guide"
 summary: "For your first time on a prediction market, walk the full flow — open an account, fund, place a first trade, withdraw — at a cost of $5–10."

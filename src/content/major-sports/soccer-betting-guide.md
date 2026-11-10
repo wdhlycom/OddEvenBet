@@ -1,5 +1,5 @@
 ---
-title: "Soccer Betting Guide for Beginners: Start with the Asian Handicap and Totals"
+title: "Soccer Betting: the Draw Is the Trap Beginners Walk Into"
 description: "Soccer is the world's largest betting market with the most complex markets. Skip corners and cards at first — master the handicap and totals, the two foundations."
 kind: "guide"
 summary: "The foundations of soccer betting: the moneyline, the Asian handicap and totals, plus why the draw is so often undervalued."

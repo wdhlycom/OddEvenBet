@@ -1,7 +1,12 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
 
+// Division of labour: this section teaches prediction markets and keeps only
+// BRIEF platform profiles; every detailed review, comparison and ranked list
+// lives in the Platforms hub (/reviews).
 const entries = (await getCollection('prediction-markets', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
   .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
 
@@ -12,15 +17,17 @@ const byKind = (k: string) => entries
 const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[] = [
   { key: 'explainer', title: 'Understand first: the basics', items: byKind('explainer') },
   { key: 'guide', title: 'Guides', items: byKind('guide') },
-  { key: 'review', title: 'Platform reviews', items: byKind('review') },
-  { key: 'compare', title: 'Comparisons', items: byKind('compare') },
-  { key: 'best', title: 'Best lists', items: byKind('best') },
 ].filter((g) => g.items.length)
+
+// Brief profiles only — no review/compare cards here. Each card deep-links to
+// the platform's own group on the Platforms hub, where all its articles live.
+const platformSlugs = ['polymarket', 'kalshi', 'limitless', 'novig', 'prophetx', 'og-com', 'predictit', 'fanduel-predicts', 'draftkings-predictions', 'underdog-predict', 'robinhood-predict', 'coinbase-predict', 'fanatics-markets']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
 ---
 
 <BaseLayout
-  title="Prediction markets: reviews, comparisons and guides"
-  description="Hands-on reviews, side-by-side comparisons and plain-English guides on prediction markets like Polymarket and Kalshi — real events with checkable results."
+  title="Prediction markets: explainers and guides"
+  description="Plain-English explainers and guides on prediction markets like Polymarket and Kalshi — how they work, what they cost and where the real risks are. Platform reviews live in the Platforms hub."
   path="/prediction-markets"
 >
   <section class="page-masthead">
@@ -29,8 +36,8 @@ const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[]
       <h1>Bet on real events, not on the house</h1>
       <p class="lede">
         Prediction markets let you trade on elections, macro data and world events against
-        other people — with a price that reads as a probability. We review the platforms,
-        explain the mechanics, and name the parts that are genuinely risky.
+        other people — with a price that reads as a probability. Start with the mechanics,
+        then pick a venue in the Platforms hub.
       </p>
     </div>
   </section>
@@ -42,13 +49,26 @@ const groups: { key: string; title: string; items: ReturnType<typeof byKind> }[]
         <div class="grid">
           {g.items.map((e) => (
             <article class="card card-link">
-              <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              <span class="meta">{e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
               <h3><a href={`/prediction-markets/${e.id}`}>{e.data.title}</a></h3>
-              <p>{e.data.kind === 'review' ? e.data.verdict : e.data.summary}</p>
+              <p>{e.data.summary}</p>
             </article>
           ))}
         </div>
       </div>
     ))}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>The main platforms, briefly</h2>
+        <p class="muted" style="max-width:52ch;">
+          One-line profiles here. The detailed reviews and side-by-side comparisons are in
+          the <a href="/reviews">Platforms hub</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} href={`/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
+    )}
   </section>
 </BaseLayout>

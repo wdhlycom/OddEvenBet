@@ -1,14 +1,27 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
 
+// Division of labour: sport guides stay here; platform reviews, comparisons
+// and best lists live in the Platforms hub (/reviews). This section keeps only
+// brief profiles of the licensed books relevant to the major leagues.
 const entries = (await getCollection('major-sports', ({ data }) => !data.draft && (data.lang ?? 'en') === 'en'))
-  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const guides = entries.filter((e) => e.data.kind === 'guide')
+
+// Licensed, state/UK-regulated books first for the major leagues. Slugs mirror
+// platforms.ts; crypto books live in the niche-sports section. Each card
+// deep-links to the platform's own group on the Platforms hub.
+const platformSlugs = ['draftkings', 'bet365']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
 ---
 
 <BaseLayout
   title="Major sports betting: the big leagues and top sportsbooks"
-  description="A concise directory of the major sportsbooks — bet365, DraftKings and the rest — for bettors who just want a trusted licensed operator."
+  description="Learn the betting basics for football, NFL, NBA, MLB and NHL, then pick a licensed sportsbook — brief profiles here, full reviews in the Platforms hub."
   path="/major-sports"
 >
   <section class="page-masthead">
@@ -16,29 +29,40 @@ const entries = (await getCollection('major-sports', ({ data }) => !data.draft &
       <span class="eyebrow">Major Sports</span>
       <h1>The big leagues, listed without the noise</h1>
       <p class="lede">
-        Premier League, NBA, NFL and the other major competitions are already covered by
-        every site on the internet. We keep this section lean: a directory of the licensed
-        books worth your money, no padding.
+        Premier League, NBA, NFL and the other major competitions are covered by every
+        site on the internet. We keep it lean: first understand the sport and its
+        markets, then pick a licensed book — no padding.
       </p>
     </div>
   </section>
 
   <section class="wrap" style="padding-bottom:64px;">
-    {entries.length > 0 ? (
-      <div class="grid">
-        {entries.map((e) => (
-          <article class="card card-link">
-            <span class="meta">{e.data.kind} · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
-            <h3><a href={`/major-sports/${e.id}`}>{e.data.title}</a></h3>
-            <p>{e.data.summary}</p>
-          </article>
-        ))}
+    {guides.length > 0 && (
+      <div style="margin-top:32px;">
+        <h2>Understand the sport first</h2>
+        <div class="grid">
+          {guides.map((e) => (
+            <article class="card card-link">
+              <span class="meta">Guide · {e.data.updated.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/major-sports/${e.id}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
       </div>
-    ) : (
-      <p class="muted">
-        This directory is being built. We're keeping it deliberately short — a handful of
-        licensed books rather than a full comparison grind.
-      </p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>Licensed books, briefly</h2>
+        <p class="muted" style="max-width:52ch;">
+          One-line profiles here. Detailed reviews, comparisons and ranked lists are in
+          the <a href="/reviews">Platforms hub</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} href={`/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
     )}
   </section>
 </BaseLayout>

@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import PlatformCard from '@/components/PlatformCard.astro'
+import { bySlug } from '@/data/platforms'
+
+// División del trabajo: las guías de deportes se quedan aquí; las reseñas y
+// comparaciones de plataformas viven en el centro de Plataformas (/reviews).
+// Los deportes de nicho dependen de casas cripto, así que los perfiles breves
+// de abajo son los cripto-nativos.
+const entries = (await getCollection('niche-sports', ({ data }) => !data.draft && data.lang === 'es'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+
+const slugOf = (e: { id: string }) => e.id.replace(/^es\//, '')
+
+const guides = entries.filter((e) => e.data.kind === 'guide')
+
+const platformSlugs = ['stake', 'bcgame', 'thunderpick', 'betsio', 'apuesta360', 'ggbet', 'pinnacle']
+const sectionPlatforms = platformSlugs.map(bySlug).filter(Boolean)
+---
+
+<BaseLayout
+  title="Apuestas de deportes de nicho: esports, dardos, snooker y más"
+  description="Guías para apostar en esports, dardos, snooker, tenis y otros mercados de nicho. Perfiles breves de plataformas aquí; reseñas y comparaciones completas en el centro de Plataformas."
+  path="/es/niche-sports"
+  lang="es"
+>
+  <section class="page-masthead">
+    <div class="wrap">
+      <span class="eyebrow">Deportes de nicho</span>
+      <h1>Los mercados que los grandes sitios se saltan</h1>
+      <p class="lede">
+        Esports, dardos, snooker y las ligas más pequeñas son donde un especialista aún puede
+        superar a los gigantes. Aprende primero los mercados de cada deporte y luego mira qué
+        plataformas los ofrecen.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:64px;">
+    {guides.length > 0 && (
+      <div style="margin-top:32px;">
+        <h2>Entiende el deporte primero</h2>
+        <div class="grid">
+          {guides.map((e) => (
+            <article class="card card-link">
+              <span class="meta">Guía · {e.data.updated.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}</span>
+              <h3><a href={`/es/niche-sports/${slugOf(e)}`}>{e.data.title}</a></h3>
+              <p>{e.data.summary}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {entries.length === 0 && (
+      <p class="muted">El contenido en español se está redactando poco a poco.</p>
+    )}
+
+    {sectionPlatforms.length > 0 && (
+      <div style="margin-top:48px;">
+        <h2>Dónde viven estos mercados, en breve</h2>
+        <p class="muted" style="max-width:52ch;">
+          Perfiles de una línea aquí. Las reseñas y comparaciones detalladas están en el
+          <a href="/es/reviews">centro de Plataformas</a>.
+        </p>
+        <div class="grid">
+          {sectionPlatforms.map((p) => p && <PlatformCard platform={p} lang="es" href={`/es/reviews#platform-${p.slug}`} />)}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

@@ -1,5 +1,5 @@
 ---
-title: "Major Sports Betting Guide: Soccer, NFL, NBA, Hockey and MLB"
+title: "Major Sports Betting: Where the Information Edge Disappears"
 description: "Major sports are betting's main battleground — deep markets, full information, and the fiercest competition. This maps the five major sports and points to each guide."
 kind: "explainer"
 summary: "Major sports have deep markets and full information, but your opponents are also the most professional. Look at the positioning of the five sports first, then enter each page."
